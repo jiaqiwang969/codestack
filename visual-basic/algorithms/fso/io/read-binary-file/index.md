@@ -13,4 +13,24 @@ content = ReadByteArrFromFile("C:\MyFolder\MyFile.dat")
 
 Code will generate an exception if file doesn't exist or cannot be read.
 
-{% code-snippet { file-name: ReadBinary.vba } %}
+~~~ vb
+Function ReadByteArrFromFile(filePath) As Byte()
+
+    Dim buff() As Byte
+    
+    Dim fileNumb As Integer
+    fileNumb = FreeFile
+    
+    Open filePath For Binary Access Read As fileNumb
+    
+    ReDim buff(0 To LOF(fileNumb) - 1)
+    
+    Get fileNumb, , buff
+    
+    Close fileNumb
+    
+    ReadByteArrFromFile = buff
+    
+End Function
+~~~
+

@@ -46,7 +46,7 @@ If *Register for COM Interop* option is selected in Visual Studio this will auto
 
 ## Example add-in with API
 
-The following add-in examples is built using the [SwEx.AddIn Framework](/labs/solidworks/swex/add-in/), but the same technique can apply to add-in built with different methods.
+The following add-in examples is built using the [SwEx.AddIn Framework](/docs/codestack/labs/solidworks/swex/add-in/), but the same technique can apply to add-in built with different methods.
 
 Add-in adds the menu command under the *Tools* menu allowing to create cylindrical feature
 
@@ -67,7 +67,106 @@ And returns the pointer to [IFeature](https://help.solidworks.com/2018/english/a
 
 ### C# Add-in source code
 
-{% code-snippet { file-name: AddIn.cs } %}
+~~~ cs
+using CodeStack.SwEx.AddIn;
+using CodeStack.SwEx.AddIn.Attributes;
+using CodeStack.SwEx.AddIn.Enums;
+using SolidWorks.Interop.sldworks;
+using SolidWorks.Interop.swconst;
+using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+
+namespace CodeStack.Examples.CreateGeometryAddIn
+{
+    [SwEx.Common.Attributes.Title("Create Geometry")]
+    public enum Commans_e
+    {
+        [CommandItemInfo(swWorkspaceTypes_e.Part)]
+        [SwEx.Common.Attributes.Title("Create Cylinder")]
+        CreateCylinder
+    }
+
+    [ComVisible(true)]
+    public interface IGeometryAddIn
+    {
+        IFeature CreateCylinder(double diam, double height);
+    } 
+
+    [AutoRegister("CreateGeometryAddIn", "Sample add-in for creating geometry", true)]
+    [ComVisible(true), Guid("799A191E-A4CF-4622-9E77-EA1A9EF07621")]
+    [ProgId("CodeStack.GeometryAddIn")]
+    public class AddIn : SwAddInEx, IGeometryAddIn
+    {
+        public override bool OnConnect()
+        {
+            this.AddCommandGroup<Commans_e>(OnButtonClick);
+
+            return true;
+        }
+
+        private void OnButtonClick(Commans_e cmd)
+        {
+            try
+            {
+                switch (cmd)
+                {
+                    case Commans_e.CreateCylinder:
+                        CreateCylinder(0.1, 0.1);
+                        break;
+                }
+            }
+            catch(Exception ex)
+            {
+                Trace.WriteLine(ex.Message);
+                App.SendMsgToUser2("Failed to create geometry", 
+                    (int)swMessageBoxIcon_e.swMbStop, (int)swMessageBoxBtn_e.swMbOk);
+            }
+        }
+        
+        public IFeature CreateCylinder(double diam, double height)
+        {
+            var part = App.ActiveDoc as IPartDoc;
+
+            if (part == null)
+            {
+                throw new NotSupportedException("Only part document are supported");
+            }
+
+            var modeler = App.IGetModeler();
+
+            var body = modeler.CreateBodyFromCyl(new double[]
+            {
+                0, 0, 0,
+                0, 1, 0,
+                diam / 2, height
+            });
+
+            if (body != null)
+            {
+                var feat = part.CreateFeatureFromBody3(body, false,
+                    (int)swCreateFeatureBodyOpts_e.swCreateFeatureBodySimplify) as IFeature;
+
+                if (feat != null)
+                {
+                    return feat;
+                }
+                else
+                {
+                    throw new NullReferenceException("Failed to create feature from body");
+                }
+            }
+            else
+            {
+                throw new NullReferenceException("Failed to create body. Make sure that the parameters are valid");
+            }
+        }
+    }
+}
+
+~~~
+
+
 
 ## Accessing the add-in
 
@@ -108,7 +207,25 @@ Note that the interface will be visible in the object browser:
 
 #### VBA macro invoking add-in function
 
-{% code-snippet { file-name: Macro.vba } %}
+~~~ vb
+Dim swApp As SldWorks.SldWorks
+
+Sub main()
+
+    Set swApp = Application.SldWorks
+    
+    Dim swGeomAddIn As CreateGeometryAddIn.IGeometryAddIn
+
+    Set swGeomAddIn = swApp.GetAddInObject("CodeStack.GeometryAddIn")
+    
+    Dim swFeat As SldWorks.Feature
+    Set swFeat = swGeomAddIn.CreateCylinder(0.2, 0.5)
+    swFeat.Name = "MyCylinder"
+    
+End Sub
+~~~
+
+
 
 This macro will create the cylinder with custom parameters and use the returned pointer to feature to rename it.
 
@@ -120,21 +237,61 @@ Note that the add-in errors are correctly thrown from the macro. For example the
 
 ### Calling add-in from stand-alone applications
 
-Similarly to VBA macro, add-in can be automated from the [Stand-Alone Applications](/solidworks-api/getting-started/stand-alone/). To enable type safety it is required to add the reference to add-in dll. Note if add-in is a .NET add-in you won't be able to add .tlb file as the reference, instead it is required to add the actual add-in dll.
+Similarly to VBA macro, add-in can be automated from the [Stand-Alone Applications](/docs/codestack/solidworks-api/getting-started/stand-alone/). To enable type safety it is required to add the reference to add-in dll. Note if add-in is a .NET add-in you won't be able to add .tlb file as the reference, instead it is required to add the actual add-in dll.
 
 #### VB.NET Stand-Alone application
 
-{% code-snippet { file-name: Module.vb } %}
+~~~ vb
+Imports CodeStack.Examples.CreateGeometryAddIn
+Imports SolidWorks.Interop.sldworks
+
+Module Module
+
+    Sub Main()
+
+        Dim app As ISldWorks = GetObject("", "SldWorks.Application")
+        Dim geomAddIn As IGeometryAddIn = app.GetAddInObject("CodeStack.GeometryAddIn")
+        Dim feat As IFeature = geomAddIn.CreateCylinder(0.2, 0.2)
+        feat.Name = "MyCylinder"
+
+    End Sub
+
+End Module
+
+~~~
+
+
 
 #### C# Stand-Alone application
 
-{% code-snippet { file-name: Program.cs } %}
+~~~ cs
+using CodeStack.Examples.CreateGeometryAddIn;
+using SolidWorks.Interop.sldworks;
+using System;
+
+namespace ConsoleAddIn
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var app = Activator.CreateInstance(Type.GetTypeFromProgID("SldWorks.Application")) as ISldWorks;
+            var geomAddIn = app.GetAddInObject("CodeStack.GeometryAddIn") as IGeometryAddIn;
+            var feat = geomAddIn.CreateCylinder(0.2, 0.2);
+            feat.Name = "MyCylinder";
+        }
+    }
+}
+
+~~~
+
+
 
 Exception can also be handled from the stand-alone application
 
 ![.NET exception thrown in the .NET application](add-in-exception-net.png){ width=550 }
 
-> The above approach to connect to SOLIDWORKS instance (Activator::CreateInstance or GetObject methods) in some cases might create new invisible instance of SOLIDWORKS instead of connecting to an existing session. These instances would be created as background applications and no add-ins loaded so the code will fail. To force connect to the active session of SOLIDWORKS follow [Connecting by querying the COM instance from the Running Object Table (ROT)](/solidworks-api/getting-started/stand-alone/#method-b-connecting-by-querying-the-com-instance-from-the-running-object-table-rot) article.
+> The above approach to connect to SOLIDWORKS instance (Activator::CreateInstance or GetObject methods) in some cases might create new invisible instance of SOLIDWORKS instead of connecting to an existing session. These instances would be created as background applications and no add-ins loaded so the code will fail. To force connect to the active session of SOLIDWORKS follow [Connecting by querying the COM instance from the Running Object Table (ROT)](/docs/codestack/solidworks-api/getting-started/stand-alone/#method-b-connecting-by-querying-the-com-instance-from-the-running-object-table-rot) article.
 
 #### Notes
 

@@ -37,7 +37,7 @@ redirect-from:
 
 This page contains a library of useful macros, utilities and scripts for SOLIDWORKS engineers. Macros are grouped by categories: part assembly, drawing, performance etc.
 
-Follow the [Programming VBA and VSTA macros using SOLIDWORKS API](/solidworks-api/getting-started/macros/) section for guidelines of using and creating macros in SOLIDWORKS.
+Follow the [Programming VBA and VSTA macros using SOLIDWORKS API](/docs/codestack/solidworks-api/getting-started/macros/) section for guidelines of using and creating macros in SOLIDWORKS.
 
 Cannot find the macro for you? Submit the [request macro](https://github.com/xarial/codestack/issues/new?labels=macro-request) form and our team will review your request and will try to add the macro to the library.
 
@@ -47,11 +47,11 @@ Cannot find the macro for you? Submit the [request macro](https://github.com/xar
 
 ![Custom macro buttons in the toolbar](macro-library-toolbar.png){ width=450 }
 
-Alternatively macro buttons can be created using native SOLIDWORKS functionality. Read [Creating macro buttons in SOLIDWORKS toolbars](/solidworks-api/getting-started/macros/macro-buttons/) for more information.
+Alternatively macro buttons can be created using native SOLIDWORKS functionality. Read [Creating macro buttons in SOLIDWORKS toolbars](/docs/codestack/solidworks-api/getting-started/macros/macro-buttons/) for more information.
 
 Explore this section to find productivity and automation tools which suit your needs.
 
-For additional productivity add-ins visit the [SOLIDWORKS Labs](/labs/solidworks/) page.
+For additional productivity add-ins visit the [SOLIDWORKS Labs](/docs/codestack/labs/solidworks/) page.
 
 ## Batch Running
 

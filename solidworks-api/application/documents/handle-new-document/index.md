@@ -26,23 +26,56 @@ Sub main(model As SldWorks.ModelDoc2)
 End Sub
 ~~~
 
-* It might be useful to automatically run this macro with each session of SOLIDWORKS. Follow the [Run SOLIDWORKS macro automatically on application start](solidworks-api/getting-started/macros/run-macro-on-solidworks-start/) link for more information.
-* To learn how to run another macro or group of macros refer [Run Group Of Macros](/solidworks-api/application/frame/run-macros-group/) article
+* It might be useful to automatically run this macro with each session of SOLIDWORKS. Follow the [Run SOLIDWORKS macro automatically on application start](/docs/codestack/solidworks-api/getting-started/macros/run-macro-on-solidworks-start/) link for more information.
+* To learn how to run another macro or group of macros refer [Run Group Of Macros](/docs/codestack/solidworks-api/application/frame/run-macros-group/) article
 
 ## Macro Module
 
 Entry point which starts new document creation events monitoring
 
-{% code-snippet { file-name: Macro.vba } %}
+~~~ vb
+Dim swFileNewWatcher As FileNewWatcher
+
+Sub main()
+    
+    Set swFileNewWatcher = New FileNewWatcher
+    
+    While True
+        DoEvents
+    Wend
+    
+End Sub
+~~~
+
+
 
 ## FileNewWatcher Class module
 
 Class which handles SOLIDWORKS new document API notifications
 
-{% code-snippet { file-name: FileNewWatcher.vba } %}
+~~~ vb
+Dim WithEvents swApp As SldWorks.SldWorks
+
+Private Sub Class_Initialize()
+    Set swApp = Application.SldWorks
+End Sub
+
+Private Function swApp_FileNewNotify2(ByVal NewDoc As Object, ByVal DocType As Long, ByVal TemplateName As String) As Long
+    HandlerModule.main NewDoc
+End Function
+~~~
+
+
 
 ## HandlerModule module
 
 Custom VBA code which needs to be run for each newly created document
 
-{% code-snippet { file-name: HandlerModule.vba } %}
+~~~ vb
+Sub main(model As SldWorks.ModelDoc2)
+    'TODO:implement the procedure
+    MsgBox "File create: " & model.GetTitle()
+End Sub
+~~~
+
+

@@ -21,7 +21,33 @@ The following guide explains how to enable Quick View mode directly from the Win
 * Create a text file with an extension of .vbs and name it *opener.vbs*
 * Paste the following code into this file
 
-{% code-snippet { file-name: opener.vbs } %}
+~~~ vbs
+Dim swApp
+Set swApp = CreateObject("SldWorks.Application")
+swApp.Visible = True
+
+Dim filePath
+filePath = WScript.Arguments.Item(0)
+
+If filePath <> "" then
+
+	Dim docSpec
+	Set docSpec = swApp.GetOpenDocSpec(filePath)
+	docSpec.ViewOnly = True
+
+	Dim swModel
+	Set swModel = swApp.OpenDoc7(docSpec)
+
+	If swModel is Nothing Then
+		MsgBox "Failed to open document"
+	End If
+	
+Else
+	MsgBox "File path is not specified"
+End If
+~~~
+
+
 
 * Create another text file and name it *install.cmd*
 * Add the following line into the *install.cmd* which will enable a Quick Mode for assemblies

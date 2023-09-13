@@ -10,7 +10,30 @@ This example demonstrates how to extract mass properties from the specified file
 * Create a text file and name it as *get-mass-prps.vbs*
 * Copy-paste the following code into the file
 
-{% code-snippet { file-name: script.vbs } %}
+~~~ vbs
+Dim swApp
+Set swApp = CreateObject("SldWorks.Application")
+
+Dim filePath
+filePath = InputBox("Specify the path to the part file")
+
+Dim docSpec
+Set docSpec = swApp.GetOpenDocSpec(filePath)
+docSpec.ReadOnly = True
+docSpec.Silent = True
+
+Dim swModel
+Set swModel = swApp.OpenDoc7(docSpec)
+
+Dim swMassPrps
+Set swMassPrps = swModel.Extension.CreateMassProperty()
+
+MsgBox "Mass: " & swMassPrps.Mass & vbLf & "Volume: " & swMassPrps.Volume & vbLf & "Surface area: " & swMassPrps.SurfaceArea
+
+swApp.CloseDoc swModel.GetTitle()
+~~~
+
+
 
 * Save the file
 * Double click to run the script

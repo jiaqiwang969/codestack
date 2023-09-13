@@ -1,4 +1,4 @@
-<img src="https://www.codestack.net/logo.svg" alt="CodeStack" width="200">
+<img src="https://www.codestack.net/logo.svg" alt="CodeStack" width="200"/>
 
 &#128279; [https://www.codestack.net](https://www.codestack.net)
 

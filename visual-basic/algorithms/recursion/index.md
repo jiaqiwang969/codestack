@@ -5,7 +5,7 @@ description: Explanation of recursion and usage in Visual Basic to output the st
 ---
 In some cases it might be required to parse the hierarchical data. This is a tree-structured data which has a collection of nodes while each node may contain the collection of children, and each child can have a collection of its own children and so on. Example of hierarchical data is an XML file which contains the nodes which might have sub-nodes.
 
-This data can be parsed using [loops](/visual-basic/loops/), however this task would be complicated and code readability will be compromised. Much easier solution would be an employment of recursion technique.
+This data can be parsed using [loops](/docs/codestack/visual-basic/loops/), however this task would be complicated and code readability will be compromised. Much easier solution would be an employment of recursion technique.
 
 This function will parse the single node (or node on a single level) and then call itself recursively to process all children nodes.
 
@@ -17,7 +17,13 @@ This structure is described with the following class in the Visual Basic, where 
 
 ## BomItem Class
 
-{% code-snippet { file-name: BomItem.vba } %}
+~~~ vb
+Public Name As String
+Public Qty As Integer
+Public Children As Variant
+~~~
+
+
 
 In order to output the structure the following function can be written
 

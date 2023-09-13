@@ -23,7 +23,7 @@ This macro helps to capture the id of command directly from SOLIDWORKS by clicki
 
 ![Capturing sketch hide command id](capturing-hide-command-id.png){ width=350 }
 
-The command id can be looked up in the the [commands list]((https://help.solidworks.com/2012/english/api/swcommands/solidworks.interop.swcommands~solidworks.interop.swcommands.swcommands_e.html))
+The command id can be looked up in the the [commands list](https://help.solidworks.com/2012/english/api/swcommands/solidworks.interop.swcommands~solidworks.interop.swcommands.swcommands_e.html)
 
 ![Hide sketch command id in swCommands_e enumeration](sw-commands-id.png){ width=350 }
 
@@ -31,7 +31,7 @@ The command id can be looked up in the the [commands list]((https://help.solidwo
 
 ## Capturing commands from the custom add-ins
 
-For the standard SOLIDWORKS commands, User Command argument will be equal to 0. However commands cannot be defined for any custom add-in or [Macro Buttons](/solidworks-api/getting-started/macros/macro-buttons/)
+For the standard SOLIDWORKS commands, User Command argument will be equal to 0. However commands cannot be defined for any custom add-in or [Macro Buttons](/docs/codestack/solidworks-api/getting-started/macros/macro-buttons/)
 
 If this command is clicked, the command id would be equal to one of the following:
 
@@ -55,8 +55,26 @@ Command would indicate the type of the button (minimized toolbar, menu, macro bu
 
 **Macro**
 
-{% code-snippet { file-name: Macro.vba } %}
+~~~ vb
+Sub main()
+    CommandsMonitorForm.Show vbModeless
+End Sub
+~~~
+
+
 
 **CommandsMonitorForm**
 
-{% code-snippet { file-name: CommandsMonitorForm.vba } %}
+~~~ vb
+Dim WithEvents swApp As SldWorks.SldWorks
+
+Private Sub UserForm_Initialize()
+    Set swApp = Application.SldWorks
+End Sub
+
+Private Function swApp_CommandOpenPreNotify(ByVal Command As Long, ByVal UserCommand As Long) As Long
+    lstLog.AddItem "Command: " & Command & "; User Command:" & UserCommand
+End Function
+~~~
+
+

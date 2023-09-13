@@ -44,7 +44,39 @@ The limitations are:
 
 Much better approach is to use the [PDM Vault Browser ](https://github.com/codestackdev/pdm-vault-browser/releases/tag/initial)tool. Source code is available on [GitHub](https://github.com/codestackdev/pdm-vault-browser). Source code is provided below (must be compiled in .NET Framework 4.0 otherwise the debug symbols will not be loaded):
 
-{% code-snippet { file-name: SwPdmVaultBrowser.cs } %}
+~~~ cs
+using System;
+using System.Linq;
+using System.Windows.Forms;
+
+namespace SwPdmVaultBrowser
+{
+    class Program
+    {
+        [STAThread]
+        static void Main(string[] args)
+        {
+            var path = "";
+
+            if (args.Any())
+            {
+                path = args.First();
+            }
+
+            var dlg = new OpenFileDialog()
+            {
+                InitialDirectory = path,
+                Multiselect = true 
+            };
+
+            dlg.ShowDialog();
+        }
+    }
+}
+
+~~~
+
+
 
 This tool is a simple File Browse Dialog with multi-selection option enabled. The tool also takes a command line argument with the full path to the folder in the PDM vault. So when started it will automatically browse to the specified folder:
 
@@ -56,18 +88,140 @@ Video Demonstration:
 
 {% youtube { id: uVcc4zvsSN0 } %}
 
-Examples of PDM add-ins. Please read the [How To Create SOLIDWORKS PDM Professional Add-In](/solidworks-pdm-api/getting-started/add-ins/create/) article to learn how to build PDM add-in from scratch.
+Examples of PDM add-ins. Please read the [How To Create SOLIDWORKS PDM Professional Add-In](/docs/codestack/solidworks-pdm-api/getting-started/add-ins/create/) article to learn how to build PDM add-in from scratch.
 
 <details>
 <summary>C# Example</summary>
 
-{% code-snippet { file-name: PdmHelperSampleAddIn.cs } %}
+~~~ cs
+using EdmLib;
+using System;
+using System.Linq;
+using System.Runtime.InteropServices;
+
+namespace CodeStack
+{
+    [ComVisible(true)]
+    [Guid("8219E7E8-1765-4699-B509-E9DD84B337B4")]
+    public class PdmAddInSample : IEdmAddIn5
+    {
+        private enum Commands_e
+        {
+            GetIds
+        }
+        
+        public void GetAddInInfo(ref EdmAddInInfo poInfo, IEdmVault5 poVault, IEdmCmdMgr5 poCmdMgr)
+        {
+            poInfo.mbsAddInName = "SW PDM Helper";
+            poInfo.mbsDescription = "Utility functions for SOLIDWORKS PDM";
+            poInfo.mlAddInVersion = 1;
+            poInfo.mlRequiredVersionMajor = 17; //SOLIDWORKS PDM 2017 SP0
+
+            poCmdMgr.AddCmd((int)Commands_e.GetIds, "Get ID");
+        }
+
+        public void OnCmd(ref EdmCmd poCmd, ref Array ppoData)
+        {
+            if (poCmd.meCmdType == EdmCmdType.EdmCmd_Menu)
+            {
+                if (poCmd.mlCmdID == (int)Commands_e.GetIds)
+                {
+                    Func<EdmCmdData, int> getIdFunc = (d) => 
+                    {
+                        var isFile = d.mlObjectID1 != 0;
+
+                        if (isFile)
+                        {
+                            return d.mlObjectID1;
+                        }
+                        else
+                        {
+                            return d.mlObjectID2;
+                        }
+                    };
+
+                    var msg = string.Join(Environment.NewLine,
+                        (ppoData as EdmCmdData[]).Select(
+                            d => $"{d.mbsStrData1} - {getIdFunc(d)}").ToArray());
+
+                    (poCmd.mpoVault as IEdmVault10).MsgBox(0, msg);
+                }
+            }
+        }
+    }
+}
+
+~~~
+
+
 
 </details>
 
 <details>
 <summary>VB.NET Example</summary>
 
-{% code-snippet { file-name: PdmHelperSampleAddIn.vb } %}
+~~~ vb
+Imports EdmLib
+Imports System.Runtime.InteropServices
+Imports System.Text
+
+Namespace CodeStack
+
+    <ComVisible(True)>
+    <Guid("B761142B-BEEB-4E4D-8332-6B9E9D646B16")>
+    Public Class PdmAddInSample
+        Implements IEdmAddIn5
+
+        Private Enum Commands_e
+            GetIds
+        End Enum
+
+        Public Sub GetAddInInfo(ByRef poInfo As EdmAddInInfo, ByVal poVault As IEdmVault5, ByVal poCmdMgr As IEdmCmdMgr5) Implements IEdmAddIn5.GetAddInInfo
+
+            poInfo.mbsAddInName = "SW PDM Helper"
+            poInfo.mbsDescription = "Utility functions for SOLIDWORKS PDM"
+            poInfo.mlAddInVersion = 1
+            poInfo.mlRequiredVersionMajor = 17
+            poCmdMgr.AddCmd(CInt(Commands_e.GetIds), "Get ID1")
+
+        End Sub
+
+        Public Sub OnCmd(ByRef poCmd As EdmCmd, ByRef ppoData As Array) Implements IEdmAddIn5.OnCmd
+
+            If poCmd.meCmdType = EdmCmdType.EdmCmd_Menu Then
+
+                If poCmd.mlCmdID = Commands_e.GetIds Then
+
+                    Dim msg As New StringBuilder()
+
+                    For Each data As EdmCmdData In ppoData
+                        msg.AppendLine($"{data.mbsStrData1} - {GetId(data)}")
+                    Next
+
+                    TryCast(poCmd.mpoVault, IEdmVault10).MsgBox(0, msg.ToString())
+
+                End If
+            End If
+        End Sub
+
+        Private Function GetId(data As EdmCmdData) As Integer
+
+            Dim isFile = data.mlObjectID1 <> 0
+
+            If isFile Then
+                Return data.mlObjectID1
+            Else
+                Return data.mlObjectID2
+            End If
+
+        End Function
+
+    End Class
+
+End Namespace
+
+~~~
+
+
 
 </details>

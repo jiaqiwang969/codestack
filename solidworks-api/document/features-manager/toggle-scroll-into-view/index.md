@@ -22,4 +22,18 @@ Return CType(Application, Object).Sw.GetUserPreferenceToggle(64)
 
 ![Code for handling the state of the toggle button](toggle-state-code.png)
 
-{% code-snippet { file-name: Macro.vba } %}
+~~~ vb
+Dim swApp As SldWorks.SldWorks
+
+Sub main()
+
+    Set swApp = Application.SldWorks
+    
+    Dim curVal As Boolean
+    curVal = False <> swApp.GetUserPreferenceToggle(swUserPreferenceToggle_e.swFeatureManagerEnsureVisible)
+    
+    swApp.SetUserPreferenceToggle swUserPreferenceToggle_e.swFeatureManagerEnsureVisible, Not curVal
+    
+End Sub
+~~~
+

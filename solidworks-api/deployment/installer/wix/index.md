@@ -161,7 +161,53 @@ Alternatively files can be added automatically using the harvest tool so it is n
 
 *Transforms* property allows to define the xslt transformation to exclude any files (e.g. pdb or xml) which are not required to be a part of the installer:
 
-{% code-snippet { file-name: DirectoryHeatTransform.xslt } %}
+~~~ xslt
+<?xml version="1.0" encoding="utf-8"?>
+<xsl:stylesheet
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:wix="http://schemas.microsoft.com/wix/2006/wi"
+    xmlns="http://schemas.microsoft.com/wix/2006/wi"
+    version="1.0"
+    exclude-result-prefixes="xsl wix">
+
+    <xsl:output method="xml" indent="yes" omit-xml-declaration="yes" />
+
+    <xsl:strip-space elements="*" />
+
+    <xsl:key
+        name="AddInToRemove"
+        match="wix:Component[ wix:File/@Source = '$(var.SourceOutDir)\CodeStack.Sw.MyToolbar.dll']"
+        use="@Id" />
+
+    <xsl:key
+        name="TlbToRemove"
+        match="wix:Component[ substring( wix:File/@Source, string-length( wix:File/@Source ) - 3 ) = '.tlb' ]"
+        use="@Id" />
+
+    <xsl:key
+        name="XmlToRemove"
+        match="wix:Component[ substring( wix:File/@Source, string-length( wix:File/@Source ) - 3 ) = '.xml' ]"
+        use="@Id" />
+
+    <xsl:key
+        name="PdbToRemove"
+        match="wix:Component[ substring( wix:File/@Source, string-length( wix:File/@Source ) - 3 ) = '.pdb' ]"
+        use="@Id" />
+
+    <xsl:template match="@*|node()">
+        <xsl:copy>
+            <xsl:apply-templates select="@*|node()" />
+        </xsl:copy>
+    </xsl:template>
+
+    <xsl:template match="*[ self::wix:Component or self::wix:ComponentRef ][ key( 'AddInToRemove', @Id ) ]" />
+    <xsl:template match="*[ self::wix:Component or self::wix:ComponentRef ][ key( 'TlbToRemove', @Id ) ]" />
+    <xsl:template match="*[ self::wix:Component or self::wix:ComponentRef ][ key( 'XmlToRemove', @Id ) ]" />
+    <xsl:template match="*[ self::wix:Component or self::wix:ComponentRef ][ key( 'PdbToRemove', @Id ) ]" />
+</xsl:stylesheet>
+~~~
+
+
 
 ## Registering COM components
 
@@ -257,7 +303,64 @@ When new version of binaries are ready it is required to change the **Version** 
 
 ## Template example of Product.wxs file
 
-{% code-snippet { file-name: Product.wxs } %}
+~~~ wxs
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Id="*" Name="[Product Name" Language="1033" Version="1.0.0.0" Manufacturer="[Company Name]" UpgradeCode="NEW GUID">
+        <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+        <MajorUpgrade DowngradeErrorMessage="A newer version of [Product Name] is already installed." />
+        <MediaTemplate EmbedCab="yes"/>
+
+        <UIRef Id="WixUI_InstallDir" />
+        <UIRef Id="WixUI_Common" />
+        <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+        <Icon Id="MainIconId" SourceFile="Resources\icon.ico"/>
+        <Property Id="ARPPRODUCTICON" Value="MainIconId" />
+        <WixVariable Id="WixUIBannerBmp" Value="Resources\banner.bmp" />
+        <WixVariable Id="WixUIDialogBmp" Value="Resources\dialog.bmp" />
+        <WixVariable Id="WixUILicenseRtf" Value="Resources\eula.rtf" />
+        
+        <Feature Id="ProductFeature" Title="Setup" Level="1">
+            <ComponentGroupRef Id="ProductComponents" />
+            <ComponentGroupRef Id="AddInComRegGroup"/>
+        </Feature>
+    </Product>
+
+    <Fragment>
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFiles64Folder">
+                <Directory Id="CodeStackDirId" Name="[Company Name]">
+                    <Directory Id="INSTALLFOLDER" Name="[Product Name]" />
+                </Directory>
+            </Directory>
+        </Directory>
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component Id="Reg" Guid="{NEW GUID}">
+                <RegistryValue Root="HKCU" Key="Software\SolidWorks\AddInsStartup\{ADDIN GUID}" Value="1" Type="integer" Action="write" />
+                <RegistryValue Root="HKLM" Key="Software\SolidWorks\Addins\{ADDIN GUID}" Value="0" Type="integer" Action="write" />
+                <RegistryValue Root="HKLM" Key="Software\SolidWorks\Addins\{ADDIN GUID}" Name="Description" Value="AddIn description" Type="string" Action="write" />
+                <RegistryValue Root="HKLM" Key="Software\SolidWorks\Addins\{ADDIN GUID}" Name="Title" Value="AddIn title" Type="string" Action="write" />
+            </Component>
+            <Component Id="interops" Guid="{NEW GUID}">
+                <File Id='SolidWorks.Interop.sldworks.dllID' Name='SolidWorks.Interop.sldworks.dll' Source ='$(var.SourceOutDir)\SolidWorks.Interop.sldworks.dll'/>
+                <File Id='SolidWorks.Interop.swconst.dllID' Name='SolidWorks.Interop.swconst.dll' Source ='$(var.SourceOutDir)\SolidWorks.Interop.swconst.dll'/>
+                <File Id='SolidWorks.Interop.swpublished.dllID' Name='SolidWorks.Interop.swpublished.dll' Source ='$(var.SourceOutDir)\SolidWorks.Interop.swpublished.dll'/>
+                <File Id='SolidWorksTools.dllID' Name='SolidWorksTools.dll' Source ='$(var.SourceOutDir)\SolidWorksTools.dll'/>
+            </Component>
+            <Component Id="files" Guid="{NEW GUID}">
+                <File Id='File1.dllID' Name='File1.dll' Source ='$(var.SourceOutDir)\File1.dll'/>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>
+
+~~~
+
+
 
 ## Example projects
 

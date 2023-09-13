@@ -22,12 +22,69 @@ Full name of the component consists of
 
 The names of the components in the structure above will be returned as the following (the colors in the picture match the parts in names)
 
-<span style="color: green">Assem2</span><span style="color: blue">-1</span> *Root component*
+Assem2-1 *Root component*
 
-<span style="color: purple">Assem2-1/</span><span style="color: green">Part1</span><span style="color: blue">-1</span> *Component in sub-assembly*
+Assem2-1/Part1-1 *Component in sub-assembly*
 
-<span style="color: purple">Assem2-1/</span><span style="color: green">Part2</span><span style="color: orange">^Assem2</span><span style="color: blue">-1</span> *virtual component in sub-assembly*
+Assem2-1/Part2^Assem2-1  *virtual component in sub-assembly*
 
 Example below renames any selected component (root level, component in sub-assembly and virtual) using SOLIDWORKS API by adding the suffix to its name.
 
-{% code-snippet { file-name: Macro.vba } %}
+~~~ vb
+Const SUFFIX As String = "_Renamed"
+
+Dim swApp As SldWorks.SldWorks
+
+Sub main()
+    
+    Set swApp = Application.SldWorks
+    
+    Dim swModel As SldWorks.ModelDoc2
+    Dim swSelMgr As SldWorks.SelectionMgr
+
+    Set swModel = swApp.ActiveDoc
+    
+    If Not swModel Is Nothing Then
+    
+        Set swSelMgr = swModel.SelectionManager
+        
+        Dim swComp As SldWorks.Component2
+        
+        Set swComp = swSelMgr.GetSelectedObject6(1, -1)
+        
+        If Not swComp Is Nothing Then
+        
+            Dim compName As String
+            
+            compName = swComp.Name2
+            
+            If Not swComp.GetParent() Is Nothing Then
+                'if not root remove the sub-assemblies name
+                compName = Right(compName, Len(compName) - InStrRev(compName, "/"))
+            End If
+            
+            If swComp.IsVirtual() Then
+                'if virtual remove the context assembly name
+                compName = Left(compName, InStr(compName, "^") - 1)
+            Else
+                'remove the index name
+                compName = Left(compName, InStrRev(compName, "-") - 1)
+            End If
+            
+            Dim newCompName As String
+            newCompName = compName & SUFFIX
+            
+            swComp.Name2 = newCompName
+            
+        Else
+            MsgBox "Please select component to rename"
+        End If
+    
+    Else
+        MsgBox "Please open assembly document"
+    End If
+    
+End Sub
+~~~
+
+

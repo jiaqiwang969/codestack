@@ -7,7 +7,7 @@ order: 2
 ---
 Call [IModelDoc2::Access3rdPartyStorageStore ](https://docs.codestack.net/swex/add-in/html/M_SolidWorks_Interop_sldworks_ModelDocExtension_Access3rdPartyStorageStore.htm) extension method to access the 3rd storage store. Pass the boolean parameter to read or write storage.
 
-Use this approach when it is required to store multiple data structures which need to be accessed and managed independently. Prefer this instead of creating multiple [streams](/labs/solidworks/swex/add-in/third-party-data-storage/stream/)
+Use this approach when it is required to store multiple data structures which need to be accessed and managed independently. Prefer this instead of creating multiple [streams](/docs/codestack/labs/solidworks/swex/add-in/third-party-data-storage/stream/)
 
 ## Storage Access Handler
 

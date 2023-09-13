@@ -39,8 +39,43 @@ Usually SOLIDWORKS names the method with an index, e.g. OpenDoc4, OpenDoc5, Open
 
 Example macro which is using the API added to SOLIDWORKS 2017
 
-{% code-snippet { file-name: suppress-component-sw2017.vba } %}
+~~~ vb
+Dim swApp As SldWorks.SldWorks
+Dim swAssy As SldWorks.AssemblyDoc
+
+Sub main()
+
+    Set swApp = Application.SldWorks
+    
+    Set swAssy = swApp.ActiveDoc
+    
+    swAssy.CompConfigProperties5 swComponentSuppressionState_e.swComponentSuppressed, _
+            swComponentSolvingOption_e.swComponentRigidSolving, _
+            True, False, "", False, False
+    
+End Sub
+
+~~~
+
+
 
 Modified macro which enables compatibility with SOLIDWORKS 2005 onwards
 
-{% code-snippet { file-name: suppress-component-sw2005.vba } %}
+~~~ vb
+Dim swApp As SldWorks.SldWorks
+Dim swAssy As SldWorks.AssemblyDoc
+
+Sub main()
+
+    Set swApp = Application.SldWorks
+    
+    Set swAssy = swApp.ActiveDoc
+    
+    swAssy.CompConfigProperties4 swComponentSuppressionState_e.swComponentSuppressed, _
+            swComponentSolvingOption_e.swComponentRigidSolving, _
+            True, False, "", False
+    
+End Sub
+~~~
+
+

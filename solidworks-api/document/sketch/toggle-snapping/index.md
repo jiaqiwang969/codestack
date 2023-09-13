@@ -26,4 +26,18 @@ Return CType(Application, Object).Sw.GetUserPreferenceToggle(249)
 
 Download icon [here](toggle-snapping.svg)
 
-{% code-snippet { file-name: Macro.vba } %}
+~~~ vb
+Dim swApp As SldWorks.SldWorks
+
+Sub main()
+
+    Set swApp = Application.SldWorks
+    
+    Dim curVal As Boolean
+    curVal = False <> swApp.GetUserPreferenceToggle(swUserPreferenceToggle_e.swSketchInference)
+    
+    swApp.SetUserPreferenceToggle swUserPreferenceToggle_e.swSketchInference, Not curVal
+    
+End Sub
+~~~
+

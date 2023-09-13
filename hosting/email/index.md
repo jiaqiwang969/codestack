@@ -16,7 +16,6 @@ Below video demonstrates how to setup the e-mail forwarding and alias using Gmai
 
 {% youtube { id: rqOOnlTUuAw } %}
 
-1. [Setup GoDaddy E-Mail Forwarding](godaddy-email-forwarding). As described in the video e-mails forwarded by GoDaddy from *secureserver.net* (Step 1) are not encrypted which results in the warning and vulnerability. To overcome this limitation, skip this step and go to step 2, otherwise proceed to step 4.
-1. [Transfer GoDaddy Domain To Google Domains](transfer-godaddy-domain-to-googledomains)
-1. [Setup Google Domains E-Mail Forwarding](googledomains-email-forwarding)
-1. [Setup E-Mail Aliases In Gmail](setup-gmail-email-aliases)
+1. [Setup GoDaddy E-Mail Forwarding](/docs/codestack/hosting/email/godaddy-email-forwarding). As described in the video e-mails forwarded by GoDaddy from *secureserver.net* (Step 1) are not encrypted which results in the warning and vulnerability. To overcome this limitation, skip this step and go to step 2, otherwise proceed to step 4.
+1. [Setup Google Domains E-Mail Forwarding](/docs/codestack/hosting/email/googledomains-email-forwarding)
+1. [Setup E-Mail Aliases In Gmail](/docs/codestack/hosting/email/setup-gmail-email-aliases)

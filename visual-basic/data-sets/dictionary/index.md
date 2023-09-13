@@ -6,7 +6,7 @@ image: dictionary-key-already-associated.png
 order: 3
 ---
 Visual Basic dictionary object is a collection of unique keys and associated values. It is also possible to
-[index items with keys in collection](visual-basic/data-sets/collection#indexing-items-by-keys), but in this case it is only possible to have keys of String types. While it is possible to create keys of any type in Dictionary.
+[index items with keys in collection](/docs/codestack/visual-basic/data-sets/collection#indexing-items-by-keys), but in this case it is only possible to have keys of String types. While it is possible to create keys of any type in Dictionary.
 
 Unlike collections dictionaries are COM objects and require reference to *Microsoft Scripting Runtime* library in order to use early binding.
 
@@ -24,7 +24,7 @@ Dim dict As Object 'late binding
 Set dict = CreateObject("Scripting.Dictionary")
 ~~~
 
-Refer [Early Binding and Late Binding](visual-basic/variables/declaration#early-binding-and-late-binding) article for more information about these approaches.
+Refer [Early Binding and Late Binding](/docs/codestack/visual-basic/variables/declaration#early-binding-and-late-binding) article for more information about these approaches.
 
 ## Add, edit and traverse elements
 
@@ -49,7 +49,36 @@ All keys from the dictionary can be retrieved using the **Keys** property.
 
 All values from the dictionary can be retrieved using the **Values** property.
 
-{% code-snippet { file-name: add-edit-traverse.vba } %}
+~~~ vb
+Sub AddEditAndTraverse()
+
+    Dim dict As Dictionary
+    'Set dict = CreateObject("Scripting.Dictionary")
+    Set dict = New Dictionary
+    
+    dict.Add 10, "Ten"
+    dict.Add 100, "Hundred"
+    dict.Add 1000, "Thousand"
+    
+    '10 = Ten
+    '100 = Hundred
+    '1000 = Thousand
+    For Each nmbKey In dict.Keys
+        Debug.Print nmbKey & " = " & dict.item(nmbKey)
+    Next
+    
+    dict(100) = "One Hundred" 'value modified
+    
+    'One Hundred
+    Debug.Print dict(100) 'item accessed without the the Item property
+    
+    'Empty
+    Debug.Print dict(10000) 'not existing item
+
+End Sub
+~~~
+
+
 
 ## Key compare mode
 
@@ -66,7 +95,39 @@ Mode can only be changed for an empty dictionary (without values), otherwise the
 
 ![Run-time error '5': Invalid procedure call or argument when changing the compare mode of dictionary objects with elements](change-compare-mode-invalid-procedure.png){ width=400 }
 
-{% code-snippet { file-name: exists-compare.vba } %}
+~~~ vb
+Sub ExistsCompareMode()
+    
+    Dim dict As Dictionary
+    
+    Set dict = New Dictionary
+    
+    dict.Add "A", 1
+    dict.Add "B", 2
+    dict.Add "C", 3
+    dict.Add "D", 4
+    
+    'False
+    Debug.Print dict.Exists("a")
+    
+    dict.Add "d", 5 'allows to add the element as the default comparison is binary
+    
+    'dict.CompareMode = TextCompare 'Run-time error 5: Invalid procedure call or argument
+    
+    Dim dict1 As New Dictionary
+    dict1.CompareMode = TextCompare 'case-insensitive comparison
+    
+    dict1.Add "A", 1
+    dict1.Add "B", 2
+    dict1.Add "a", 3 'Run-time error 457: This key is already associated with an element of this collection
+    
+    'True
+    Debug.Print dict1.Exists("a")
+    
+End Sub
+~~~
+
+
 
 ## Remove elements
 
@@ -78,4 +139,37 @@ Any element can be removed from the dictionary either by key or by 0-based index
 
 **RemoveAll** method allows to clear the dictionary and remove all items.
 
-{% code-snippet { file-name: remove.vba } %}
+~~~ vb
+Sub Remove()
+    
+    Dim dict As Dictionary
+    
+    Set dict = New Dictionary
+    
+    dict.Add "A", 1
+    dict.Add "B", 2
+    dict.Add "C", 3
+    dict.Add "D", 4
+    
+    dict.Remove "A"
+    
+    'dict.Remove "Not Existing Item" 'Run-time error 32811: Method Remove of object IDictionary failed
+    
+    Dim i As Integer
+    
+    '2 3 4
+    For i = 1 To dict.Count
+        Dim item As Integer
+        item = dict.Items(i - 1) '0-based index
+        Debug.Print item
+    Next
+    
+    dict.RemoveAll
+    
+    '0
+    Debug.Print dict.Count
+    
+End Sub
+~~~
+
+

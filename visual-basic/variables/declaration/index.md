@@ -7,7 +7,7 @@ order: 3
 ---
 ## Declaring variables
 
-Variables can be declared either explicitly or implicitly in Visual Basic. To declare variable explicitly it is required to use *Dim* keyword or *Public* keyword to declare the variable as public class or module member (refer the [Variables Scope](/visual-basic/variables/scope) article for more information).
+Variables can be declared either explicitly or implicitly in Visual Basic. To declare variable explicitly it is required to use *Dim* keyword or *Public* keyword to declare the variable as public class or module member (refer the [Variables Scope](/docs/codestack/visual-basic/variables/scope) article for more information).
 
 Type of the variable can be declared using *As* keyword.
 
@@ -15,7 +15,7 @@ Type of the variable can be declared using *As* keyword.
 Dim textVal As String
 ~~~
 
-> If type of the variable is not explicitly stated than it is defaulted to [Variant](/visual-basic/variables/standard-types#variant)
+> If type of the variable is not explicitly stated than it is defaulted to [Variant](/docs/codestack/visual-basic/variables/standard-types#variant)
 
 ~~~ vb
 Dim varVal 'implicitly declared as Variant
@@ -51,7 +51,7 @@ It is allowed to use declaration characters for each variable to declare the typ
 Dim intVar%, doubleVar#, longVar& 'Integer, Double and Long variables are declared explicitly using short declaration
 ~~~
 
-Refer the [Standard Types](/visual-basic/variables/standard-types) article for the list of declaration characters.
+Refer the [Standard Types](/docs/codestack/visual-basic/variables/standard-types) article for the list of declaration characters.
 
 > This is a legacy way to declare the variables. This approach is not recommended way to declare the variables.
 
@@ -73,7 +73,7 @@ var1 = 10
 var2 = var1 'value of var2 now equals to var1 which equals to 10
 ~~~
 
-It is possible to assign the value to the variable as the result of calling another function. Refer [Functions and Procedures](/visual-basic/functions) article on more information about functions.
+It is possible to assign the value to the variable as the result of calling another function. Refer [Functions and Procedures](/docs/codestack/visual-basic/functions) article on more information about functions.
 
 ~~~ vb
 Dim funcRes As Double
@@ -98,11 +98,35 @@ Once declared value of the constant cannot be changed. Otherwise the compile err
 
 This code example demonstrates different ways of declaring and assigning constants and value variables.
 
-{% code-snippet { file-name: assigning-value-variables.vba } %}
+~~~ vb
+Sub main()
+
+    Dim i, j, k As Integer 'declaring 3 variables of type Integer
+
+    i = 10 'setting the value to declared variable
+    l = 20 'setting the value of implicitly declared variable
+    Debug.Print TypeName(l) 'Integer
+    
+    Dim intVar%, doubleVar#, longVar&
+    Debug.Print TypeName(intVar%) 'Integer
+    Debug.Print TypeName(doubleVar#) 'Double
+    Debug.Print TypeName(longVar&) 'Long
+    
+    Const PI As Double = 3.14159265359 'declaring and initiating constant
+    'PI = 0 'compile error
+    
+    Dim res As Double
+    res = Sqrt(16) 'returns 4 and assigns to res variable
+    Debug.Print res
+    
+End Sub
+~~~
+
+
 
 ## Assigning reference variables
 
-Unlike value types, [references types](/visual-basic/variables/user-defined-types#class) must follow several additional rules when assigning the value.
+Unlike value types, [references types](/docs/codestack/visual-basic/variables/user-defined-types#class) must follow several additional rules when assigning the value.
 
 ![Custom User Defined Type](user-type-declaration.png){ width=200 }
 
@@ -116,7 +140,20 @@ Unlike value types, [references types](/visual-basic/variables/user-defined-type
 
 See code below for the correct assignment of reference type variable.
 
-{% code-snippet { file-name: assigning-reference-variables.vba } %}
+~~~ vb
+Sub main()
+
+    Dim userType As MyUserType
+    Set userType = New MyUserType
+    Dim obj As Object
+    
+    'obj = userType 'Object variable or with block variable not set when Set keyword is not used
+    Set obj = userType 'assigning the pointer to the MyUserType object to obj variable
+
+End Sub
+~~~
+
+
 
 > References variables are only holding the pointer to the actual value, i.e. Set keyword assigns the reference (not the actual value like in value types). That means if reference of one variable is assigned to another variables, both of them now refer the same data.
 
@@ -157,4 +194,4 @@ But it is still acceptable to use *new* keyword in late binding and CreateObject
 
 ##### Benefits
 
-* No need to maintain 3rd party references which may be an issue when code is ported to another environment or another version of 3rd party references is released. Refer this [Example of references issue](/solidworks-api/troubleshooting/macros/missing-solidworks-type-library-references)
+* No need to maintain 3rd party references which may be an issue when code is ported to another environment or another version of 3rd party references is released. Refer this [Example of references issue](/docs/codestack/solidworks-api/troubleshooting/macros/missing-solidworks-type-library-references)

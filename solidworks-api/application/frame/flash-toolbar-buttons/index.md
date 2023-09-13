@@ -12,6 +12,27 @@ In order to flash toolbar it is required to find its id. Follow the [Calling Win
 
 > Note, the id of command is persistent across SOLIDWORKS sessions and releases.
 
-Unlike standard commands, custom commands added with [SOLIDWORKS add-ins](/solidworks-api/getting-started/add-ins/) are not persistent across different installations. In order to dynamically retrieve the id of the custom command, use [ISldWorks::GetCommandID](https://help.solidworks.com/2017/english/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.ISldWorks~GetCommandID.html) API and pass persistent **command user id** and guid of the add-in.
+Unlike standard commands, custom commands added with [SOLIDWORKS add-ins](/docs/codestack/solidworks-api/getting-started/add-ins/) are not persistent across different installations. In order to dynamically retrieve the id of the custom command, use [ISldWorks::GetCommandID](https://help.solidworks.com/2017/english/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.ISldWorks~GetCommandID.html) API and pass persistent **command user id** and guid of the add-in.
 
-{% code-snippet { file-name: Macro.vba } %}
+~~~ vb
+Dim swApp As SldWorks.SldWorks
+
+Sub main()
+
+    Set swApp = Application.SldWorks
+    
+    'flash line button and show tooltip
+    FlashToolbarButton 32873
+    
+    'only show tooltip for a new file button
+    FlashToolbarButton 57600, True
+    
+End Sub
+
+Sub FlashToolbarButton(buttonId As Long, Optional tooltipOnly As Boolean = False)
+    
+    swApp.ShowBubbleTooltip buttonId, IIf(tooltipOnly, "", CStr(buttonId)), 0, "", ""
+    
+End Sub
+~~~
+

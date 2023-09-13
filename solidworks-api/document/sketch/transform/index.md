@@ -34,18 +34,125 @@ The following macro reads the selected sketch point coordinate relative to the l
 * Repeat the steps above
 * Now coordinates do not match.
 
-{% code-snippet { file-name: NoTransformsMacro.vba } %}
+~~~ vb
+Dim swApp As SldWorks.SldWorks
+
+Sub main()
+
+    Set swApp = Application.SldWorks
+    
+    Dim swModel As SldWorks.ModelDoc2
+    
+    Set swModel = swApp.ActiveDoc
+    
+    Dim swSkPt As SldWorks.SketchPoint
+    Set swSkPt = swModel.SelectionManager.GetSelectedObject6(1, -1)
+    
+    Debug.Print swSkPt.X & "; " & swSkPt.Y & "; " & swSkPt.Z
+    
+End Sub
+
+~~~
+
+
 
 ## Retrieving the global coordinates from sketch point
 
-In order to find the value of the coordinate relative to the global coordinate system it is required to find the sketch to model [transformation matrix](/solidworks-api/geometry/transformation/) via [ISketch::ModelToSketchTransform](https://help.solidworks.com/2018/english/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.ISketch~ModelToSketchTransform.html) SOLIDWORKS API property and apply this to the point coordinate.
+In order to find the value of the coordinate relative to the global coordinate system it is required to find the sketch to model [transformation matrix](/docs/codestack/solidworks-api/geometry/transformation/) via [ISketch::ModelToSketchTransform](https://help.solidworks.com/2018/english/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.ISketch~ModelToSketchTransform.html) SOLIDWORKS API property and apply this to the point coordinate.
 
 Below macro can be used to perform the steps from the previous paragraph, but now the extracted coordinates will match the values in the global coordinate system.
 
-{% code-snippet { file-name: TransformSketchCoordinateMacro.vba } %}
+~~~ vb
+Dim swApp As SldWorks.SldWorks
+
+Sub main()
+
+    Set swApp = Application.SldWorks
+    
+    Dim swModel As SldWorks.ModelDoc2
+    
+    Set swModel = swApp.ActiveDoc
+    
+    Dim swSkPt As SldWorks.SketchPoint
+    Set swSkPt = swModel.SelectionManager.GetSelectedObject6(1, -1)
+    
+    Dim swSketch As SldWorks.Sketch
+    Set swSketch = swSkPt.GetSketch
+    
+    'get the sketch to model transform (by inversing the model to sketch transform)
+    Dim swTransform As SldWorks.MathTransform
+    Set swTransform = swSketch.ModelToSketchTransform.Inverse
+        
+    Dim swMathUtils As SldWorks.MathUtility
+    Set swMathUtils = swApp.GetMathUtility
+    
+    Dim dPt(2) As Double
+    dPt(0) = swSkPt.X
+    dPt(1) = swSkPt.Y
+    dPt(2) = swSkPt.Z
+    
+    'create math point from the coordinate
+    Dim swMathPt As SldWorks.MathPoint
+    Set swMathPt = swMathUtils.CreatePoint(dPt)
+    
+    'multiple transform to move the point
+    Set swMathPt = swMathPt.MultiplyTransform(swTransform)
+    
+    'read new coordinate values
+    Dim vPt As Variant
+    vPt = swMathPt.ArrayData
+    
+    Debug.Print vPt(0) & "; " & vPt(1) & "; " & vPt(2)
+    
+End Sub
+~~~
+
+
 
 ## Creating point in sketch from global coordinates
 
 Inversed transformation should be used when it is required to create a sketch point in the 2D sketch based on the global coordinate value. The following example inserts a sketch point into an active sketch based on a XYZ value.
 
-{% code-snippet { file-name: CreateSketchPointFromGlobalCoordinate.vba } %}
+~~~ vb
+Dim swApp As SldWorks.SldWorks
+
+Sub main()
+
+    Set swApp = Application.SldWorks
+    
+    Dim swModel As SldWorks.ModelDoc2
+    
+    Set swModel = swApp.ActiveDoc
+        
+    Dim swSketch As SldWorks.Sketch
+    Set swSketch = swModel.SketchManager.ActiveSketch
+    
+    'get the model to sketch transform
+    Dim swTransform As SldWorks.MathTransform
+    Set swTransform = swSketch.ModelToSketchTransform
+        
+    Dim swMathUtils As SldWorks.MathUtility
+    Set swMathUtils = swApp.GetMathUtility
+    
+    Dim dPt(2) As Double
+    dPt(0) = 0.025
+    dPt(1) = 0
+    dPt(2) = 0.1
+    
+    'create math point from the coordinate
+    Dim swMathPt As SldWorks.MathPoint
+    Set swMathPt = swMathUtils.CreatePoint(dPt)
+    
+    'multiple transform to move the point
+    Set swMathPt = swMathPt.MultiplyTransform(swTransform)
+    
+    'read new coordinate values
+    Dim vPt As Variant
+    vPt = swMathPt.ArrayData
+    
+    swModel.SketchManager.CreatePoint vPt(0), vPt(1), vPt(2)
+    
+End Sub
+~~~
+
+

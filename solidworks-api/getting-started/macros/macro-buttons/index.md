@@ -62,4 +62,4 @@ If macro button was placed on the command tab box use the following context menu
 
 ![Properties of the macro button in the commands tab box](command-tab-macro-button-properties.png){ width=250 }
 
-If you want to place the macro button to the custom toolbar you can use the free [MyToolbar](/labs/solidworks/my-toolbar) add-in.
+If you want to place the macro button to the custom toolbar you can use the free [MyToolbar](https://cadplus.xarial.com/toolbar/) add-in.

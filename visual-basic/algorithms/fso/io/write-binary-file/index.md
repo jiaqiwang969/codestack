@@ -19,4 +19,16 @@ Code will automatically create new file if it doesn't exist.
 
 Exception will be thrown in case of any error (for example file cannot be accessed for writing).
 
-{% code-snippet { file-name: WriteBinary.vba } %}
+~~~ vb
+Function WriteByteArrToFile(filePath As String, buffer() As Byte)
+
+    Dim fileNmb As Integer
+    fileNmb = FreeFile
+    
+    Open filePath For Binary Access Write As #fileNmb
+    Put #fileNmb, 1, buffer
+    Close #fileNmb
+    
+End Function
+~~~
+

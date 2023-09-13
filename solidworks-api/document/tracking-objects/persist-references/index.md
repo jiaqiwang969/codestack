@@ -21,7 +21,57 @@ Use this example to read the id of the entity.
 
 > The id output to immediate Window might contain line break. It should be removed from the id and should be considered as single line string
 
-{% code-snippet { file-name: get-id.vba } %}
+~~~ vb
+Dim swApp As SldWorks.SldWorks
+
+Sub main()
+
+    Set swApp = Application.SldWorks
+    
+    Dim swModel As SldWorks.ModelDoc2
+    
+    Set swModel = swApp.ActiveDoc
+    
+    If Not swModel Is Nothing Then
+        
+        Dim swSelMgr As SldWorks.SelectionMgr
+        Set swSelMgr = swModel.SelectionManager
+        
+        Dim swObj As Object
+        Set swObj = swSelMgr.GetSelectedObject6(1, -1)
+        
+        If Not swObj Is Nothing Then
+            Dim vId As Variant
+            vId = swModel.Extension.GetPersistReference3(swObj)
+            Debug.Print ConvertToBase64String(vId)
+        Else
+            MsgBox "Please select object to get its persist id"
+        End If
+        
+    Else
+        MsgBox "Please open the model"
+    End If
+    
+End Sub
+
+Function ConvertToBase64String(vArr As Variant) As String
+    
+    Dim xmlDoc As Object
+    Dim xmlNode As Object
+    
+    Set xmlDoc = CreateObject("MSXML2.DOMDocument")
+    
+    Set xmlNode = xmlDoc.createElement("b64")
+    
+    xmlNode.DataType = "bin.base64"
+    xmlNode.nodeTypedValue = vArr
+    
+    ConvertToBase64String = xmlNode.Text
+    
+End Function
+~~~
+
+
 
 The following example allows to select the object by retrieving its pointer from persist id.
 
@@ -31,4 +81,62 @@ The following example allows to select the object by retrieving its pointer from
 * Enter the copied id into the box
 * The entities selected in previous example is re-selected
 
-{% code-snippet { file-name: get-object.vba } %}
+~~~ vb
+Dim swApp As SldWorks.SldWorks
+
+Sub main()
+
+    Set swApp = Application.SldWorks
+    
+    Dim swModel As SldWorks.ModelDoc2
+    
+    Set swModel = swApp.ActiveDoc
+    
+    If Not swModel Is Nothing Then
+        
+        Dim id As String
+        id = InputBox("Enter persist id encoded in base64 format")
+        
+        If id <> "" Then
+            
+            Dim vId As Variant
+            vId = Base64ToArray(id)
+            
+            Dim swObj As Object
+            Dim err As Long
+            
+            Set swObj = swModel.Extension.GetObjectByPersistReference3(vId, err)
+            
+            If Not swObj Is Nothing Then
+                Dim swSelObj(0) As Object
+                Set swSelObj(0) = swObj
+                swModel.Extension.MultiSelect2 swSelObj, False, Nothing
+            Else
+                MsgBox "Failed to get the object by persist reference. Error code " & err & " as defined in swPersistReferencedObjectStates_e"
+            End If
+            
+        End If
+        
+    Else
+        MsgBox "Please open the model"
+    End If
+    
+End Sub
+
+Private Function Base64ToArray(base64 As String) As Variant
+    
+    Dim xmlDoc As Object
+    Dim xmlNode As Object
+    
+    Set xmlDoc = CreateObject("MSXML2.DOMDocument")
+    Set xmlNode = xmlDoc.createElement("b64")
+    
+    xmlNode.DataType = "bin.base64"
+    xmlNode.Text = base64
+    
+    Base64ToArray = xmlNode.nodeTypedValue
+  
+End Function
+~~~
+
+

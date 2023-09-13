@@ -9,7 +9,22 @@ order: 1
 
 SwEx framework allows defining the commands in the enumeration (enum). In this case the enumeration value become the id of the corresponding command.
 
-{% code-snippet { file-name: CommandsManager.DefiningCommands.* } %}
+
+~~~vb
+Public Enum CommandsA_e
+    CommandA1
+    CommandA2
+End Enum
+~~~
+
+
+~~~cs
+public enum CommandsA_e
+{
+    CommandA1,
+    CommandA2
+}
+~~~
 
 ## Commands Decoration
 
@@ -36,19 +51,124 @@ Transparency is supported. SwEx framework will automatically assign the required
 
 Icons can be referenced from any static class. Usually this should be a resource class. It is required to specify the type of the resource class as first parameter, and the resource names as additional parameters. Use *nameof* keyword to load the resource name to avoid usage of 'magic' strings.
 
-{% code-snippet { file-name: CommandsManager.CommandsAttribution.* } %}
+
+~~~vb
+Imports CodeStack.SwEx.Common.Attributes
+Imports CodeStack.SwEx.My.Resources
+Imports System.ComponentModel
+
+<Title(GetType(Resources), NameOf(Resources.ToolbarTitle))>
+<Description("Command Group Title")>
+<Icon(GetType(Resources), NameOf(Resources.commands))>
+Public Enum CommandsB_e
+
+    <Title("First Command")>
+    <Description("Hint text for first command")>
+    <Icon(GetType(Resources), NameOf(Resources.command1))>
+    CommandB1
+
+    <Title("Second Command")>
+    <Description("Hint text for second command")>
+    <Icon(GetType(Resources), NameOf(Resources.command2))>
+    CommandB2
+
+    <Title("Third Command")>
+    <Description("Hint text for third command")>
+    <Icon(GetType(Resources), NameOf(Resources.command3))>
+    CommandB3
+
+End Enum
+~~~
+
+
+~~~cs
+using CodeStack.SwEx.Common.Attributes;
+using CodeStack.SwEx.Properties;
+using System.ComponentModel;
+
+[Title(typeof(Resources), nameof(Resources.ToolbarTitle))]
+[Description("Command Group Title")]
+[Icon(typeof(Resources), nameof(Resources.commands))]
+public enum CommandsB_e
+{
+    [Title("First Command")]
+    [Description("Hint text for first command")]
+    [Icon(typeof(Resources), nameof(Resources.command1))]
+    CommandB1,
+
+    [Title("Second Command")]
+    [Description("Hint text for second command")]
+    [Icon(typeof(Resources), nameof(Resources.command2))]
+    CommandB2,
+
+    [Title("Third Command")]
+    [Description("Hint text for third command")]
+    [Icon(typeof(Resources), nameof(Resources.command3))]
+    CommandB3
+}
+~~~
+
+
 
 ## Commands Scope
 
 Each command can be assigned with the operation scope (i.e. the environment where this command can be executed, e.g. Part, Assembly etc.). Scope can be assigned with [CommandItemInfoAttribute](https://docs.codestack.net/swex/add-in/html/T_CodeStack_SwEx_AddIn_Attributes_CommandItemInfoAttribute.htm) attribute by specifying the values in *suppWorkspaces* parameter of the attribute's constructor. The [swWorkspaceTypes_e](https://docs.codestack.net/swex/add-in/html/T_CodeStack_SwEx_AddIn_Enums_swWorkspaceTypes_e.htm) is a flag enumeration, so it is possible to combine the workspaces.
 
-Framework will automatically disable/enable the commands based on the active environment as per the specified scope. For additional logic for assigning the state visit [Custom Enable Command State](/labs/solidworks/swex/add-in/commands-manager/command-states/) article.
+Framework will automatically disable/enable the commands based on the active environment as per the specified scope. For additional logic for assigning the state visit [Custom Enable Command State](/docs/codestack/labs/solidworks/swex/add-in/commands-manager/command-states/) article.
 
-{% code-snippet { file-name: CommandsManager.CommandsScope.* } %}
+
+~~~vb
+Imports CodeStack.SwEx.AddIn.Attributes
+Imports CodeStack.SwEx.AddIn.Enums
+
+Public Enum CommandsD_e
+
+    <CommandItemInfo(swWorkspaceTypes_e.Part)>
+    CommandD1
+
+    <CommandItemInfo(swWorkspaceTypes_e.Part Or swWorkspaceTypes_e.Assembly)>
+    CommandD2
+
+End Enum
+~~~
+
+
+~~~cs
+using CodeStack.SwEx.AddIn.Attributes;
+using CodeStack.SwEx.AddIn.Enums;
+
+public enum CommandsD_e
+{
+    [CommandItemInfo(swWorkspaceTypes_e.Part)]
+    CommandD1,
+
+    [CommandItemInfo(swWorkspaceTypes_e.Part | swWorkspaceTypes_e.Assembly)]
+    CommandD2
+}
+~~~
 
 ## User Assigned Command Group IDs
 
 [CommandGroupInfoAttribute](https://docs.codestack.net/swex/add-in/html/T_CodeStack_SwEx_AddIn_Attributes_CommandGroupInfoAttribute.htm) allows to assign the static command id to the group. This should be applied to the enumerator definition. If this attribute is not used SwEx framework will assign the ids automatically.
 
-{% code-snippet { file-name: CommandsManager.CommandGroupId.* } %}
+~~~vb
+Imports CodeStack.SwEx.AddIn.Attributes
 
+<CommandGroupInfo(2)>
+Public Enum CommandsE_e
+    CommandE1
+    CommandE2
+End Enum
+~~~
+
+
+~~~cs
+using CodeStack.SwEx.AddIn.Attributes;
+
+[CommandGroupInfo(2)]
+public enum CommandsE_e
+{
+    CommandE1,
+    CommandE2
+}
+~~~

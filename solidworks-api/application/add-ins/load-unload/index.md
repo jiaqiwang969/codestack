@@ -9,7 +9,7 @@ group: Frame
 ---
 This macro allows to trigger the load state of the specified add-in using the [ISldWorks::LoadAddIn](https://help.solidworks.com/2018/english/api/sldworksapi/solidworks.interop.sldworks~solidworks.interop.sldworks.isldworks~loadaddin.html) and [ISldWorks::UnloadAddIn](https://help.solidworks.com/2018/english/api/sldworksapi/solidworks.interop.sldworks~solidworks.interop.sldworks.isldworks~unloadaddin.html) SOLIDWORKS API.
 
-This can be useful to provide a short-cut for loading and unloading the add-in with one button click. It is recommended to use [Macro Buttons](solidworks-api/getting-started/macros/macro-buttons/) to create a button for add-in in the toolbar.
+This can be useful to provide a short-cut for loading and unloading the add-in with one button click. It is recommended to use [Macro Buttons](/docs/codestack/solidworks-api/getting-started/macros/macro-buttons/) to create a button for add-in in the toolbar.
 
 Macro requires the add-in Global Unique Identifier (GUID) to be specified at the beginning of the macro.
 
@@ -35,4 +35,71 @@ If this option is not used set the value to an empty string
 Const ADD_IN_PATH As String = ""
 ~~~
 
-{% code-snippet { file-name: Macro.vba } %}
+~~~ vb
+Const ADD_IN_GUID As String = "{63496b16-e9ad-4d3a-8473-99d124a1672b}"
+Const ADD_IN_PATH As String = "C:\Program Files\CodeStack\MyToolbar\CodeStack.Sw.MyToolbar.dll"
+
+Dim swApp As SldWorks.SldWorks
+
+Sub main()
+
+    Set swApp = Application.SldWorks
+    
+    Dim isLoaded As Boolean
+    
+    isLoaded = IsAddInLoaded(ADD_IN_GUID)
+    
+    Debug.Print "AddIn Loaded: " & isLoaded
+    
+    Dim addInPath As String
+    
+    If ADD_IN_PATH <> "" Then
+        addInPath = ADD_IN_PATH
+    Else
+        addInPath = GetAddInPath(ADD_IN_GUID)
+    End If
+    
+    Debug.Print LoadAddIn(addInPath, Not isLoaded)
+    
+End Sub
+
+Function IsAddInLoaded(addInGuid As String) As Boolean
+    
+    Dim addIn As Object
+    Set addIn = swApp.GetAddInObject(addInGuid)
+    
+    IsAddInLoaded = Not addIn Is Nothing
+    
+End Function
+
+Function LoadAddIn(addInGuid As String, load As Boolean) As Boolean
+    
+    Const SUCCESS As Long = 0
+    
+    Dim res As Long
+    If True = load Then
+        res = swApp.LoadAddIn(addInGuid)
+    Else
+        res = swApp.UnloadAddIn(addInGuid)
+    End If
+    
+    LoadAddIn = (res = SUCCESS)
+    
+End Function
+
+Function GetAddInPath(addInGuid As String) As String
+    
+    Dim addInUri As String
+    addInUri = CreateObject("WScript.Shell").RegRead("HKCR\CLSID\" & addInGuid & "\InprocServer32\CodeBase")
+    
+    GetAddInPath = UriToLocalPath(addInUri)
+    
+End Function
+
+Function UriToLocalPath(uri As String) As String
+    UriToLocalPath = Right(uri, Len(uri) - Len("file:///"))
+    UriToLocalPath = Replace(UriToLocalPath, "/", "\")
+End Function
+~~~
+
+

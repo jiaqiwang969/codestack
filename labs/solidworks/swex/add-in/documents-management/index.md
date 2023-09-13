@@ -7,7 +7,7 @@ order: 3
 ---
 SwEx.AddIn frameworks provides utility class to manage document life cycle by creating a specified instance handler as a wrapper of a model.
 
-Call [ISwAddInEx.CreateDocumentsHandler](https://docs.codestack.net/swex/add-in/html/M_CodeStack_SwEx_AddIn_Base_ISwAddInEx_CreateDocumentsHandler__1.htm) method and pass the type of document handler as a generic argument or use a second overload to create a generic document handler which exposes [common events](events/) (e.g. saving, selection, rebuilding, [3rd party storage access](/labs/solidworks/swex/add-in/third-party-data-storage/)).
+Call [ISwAddInEx.CreateDocumentsHandler](https://docs.codestack.net/swex/add-in/html/M_CodeStack_SwEx_AddIn_Base_ISwAddInEx_CreateDocumentsHandler__1.htm) method and pass the type of document handler as a generic argument or use a second overload to create a generic document handler which exposes [common events](events/) (e.g. saving, selection, rebuilding, [3rd party storage access](/docs/codestack/labs/solidworks/swex/add-in/third-party-data-storage/)).
 
 {% code-snippet { file-name: DocMgrAddIn.DocHandlerInit.* } %}
 

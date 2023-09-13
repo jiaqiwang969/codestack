@@ -13,7 +13,7 @@ It is possible to consume (handle) events of existing object or declare and rais
 
 ## Handling events
 
-If object exposes events it is required to declare this object as [class](/visual-basic/classes/) variable and use **WithEvents** keyword
+If object exposes events it is required to declare this object as [class](/docs/codestack/visual-basic/classes/) variable and use **WithEvents** keyword
 
 ~~~ vb
 Dim WithEvents myObj As CustomObjectWithEvents
@@ -33,7 +33,7 @@ End Function
 
 ## Declaring events
 
-Events can be declared in the [class](/visual-basic/classes/) using the **Event** keyword. Signature of the event must be specified by providing the parameter names and their types in the parenthesis.
+Events can be declared in the [class](/docs/codestack/visual-basic/classes/) using the **Event** keyword. Signature of the event must be specified by providing the parameter names and their types in the parenthesis.
 
 The following example demonstrates how to raise and handle the event.
 

@@ -10,7 +10,7 @@ redirect-from:
   - /labs/solidworks/swex/add-in/commands-manager/tab-boxes/
   - /labs/solidworks/swex/add-in/commands-manager/adding-context-menu/
 ---
-[Defined commands](/labs/solidworks/swex/add-in/commands-manager/defining-commands/) can be hosted in different locations of SOLIDWORKS commands area: [command group](#command-group), which includes [menu](#menu), [toolbar](#toolbar) and [command tab box (ribbon)](#command-tab-box) as well as in the [context menu](#context-menu)
+[Defined commands](/docs/codestack/labs/solidworks/swex/add-in/commands-manager/defining-commands/) can be hosted in different locations of SOLIDWORKS commands area: [command group](#command-group), which includes [menu](#menu), [toolbar](#toolbar) and [command tab box (ribbon)](#command-tab-box) as well as in the [context menu](#context-menu)
 
 ## Command Group
 

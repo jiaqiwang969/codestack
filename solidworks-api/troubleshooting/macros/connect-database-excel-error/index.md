@@ -23,7 +23,19 @@ The drivers are also OS-architecture specific (x32/x64)
 
 * Find what abstraction layer is used. Usually there will be lines of code similar to the following.
 
-{% code-snippet { file-name: ado-db-connection.vba } %}
+~~~ vb
+Set conn = CreateObject("ADODB.Connection")
+Set records = CreateObject("ADODB.Recordset")
+    
+Dim xlsFilePath As String
+xlsFilePath = swApp.GetCurrentMacroPathFolder() & "\" & EXCEL_FILE_NAME
+    
+conn.Open "Provider=Microsoft.ACE.OLEDB.12.0;" & _
+        "Data Source=" & xlsFilePath & _
+            ";Extended Properties=""Excel 8.0;HDR=Yes;"";"
+~~~
+
+
 
 * Make sure that the appropriate driver is installed. For SOLIDWORKS 2013 onwards (check the drivers for x64 system).
 For older SOLIDWORKS version check x32 versions). Usually the drivers can be downloaded for free from the database supplier web-site or database installation package.

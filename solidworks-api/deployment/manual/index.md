@@ -41,7 +41,19 @@ Information about the add-in needs to be added to the registry so SOLIDWORKS can
 
 The keys added to HKEY_LOCAL_MACHINE are mandatory and identify the add-in to be available in the add-ins list. The keys added to HKEY_CURRENT_USER are optional and represent the start-up state of the add-in. Set value to 1 to load add-in at start-up, set to 0 to not load on start-up.
 
-{% code-snippet { file-name: add-registry.reg } %}
+~~~ reg
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\SolidWorks\Addins\{a377433e-f7cf-4a5a-9d74-b64c0c1758c2}]
+@=dword:00000001
+"Description"="Sample add-in description"
+"Title"="Sample add-in"
+
+[HKEY_CURRENT_USER\Software\SolidWorks\AddInsStartup\{a377433e-f7cf-4a5a-9d74-b64c0c1758c2}]
+@=dword:00000001
+~~~
+
+
 
 The GUID used in the example above is an add-in guid set via [GuidAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.interopservices.guidattribute?view=netframework-4.0) at the add-in class:
 
@@ -56,7 +68,65 @@ public class MyAddIn : ISwAddin
 
 As an alternative option required registry keys can be added directly from the dll when it is registered as a COM object via [ComRegisterFunctionAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.interopservices.comregisterfunctionattribute?view=netframework-4.0). In this case the above step is not required:
 
-{% code-snippet { file-name: addin-registration.cs } %}
+~~~ cs
+#region SolidWorks Registration
+
+[ComRegisterFunction]
+public static void RegisterFunction(Type t)
+{
+    try
+    {
+        var att = t.GetCustomAttributes(false).OfType<SwAddinAttribute>().FirstOrDefault();
+
+        if (att == null)
+        {
+            throw new NullReferenceException($"{typeof(SwAddinAttribute).FullName} is not set on {t.GetType().FullName}");
+        }
+
+        Microsoft.Win32.RegistryKey hklm = Microsoft.Win32.Registry.LocalMachine;
+        Microsoft.Win32.RegistryKey hkcu = Microsoft.Win32.Registry.CurrentUser;
+
+        string keyname = "SOFTWARE\\SolidWorks\\Addins\\{" + t.GUID.ToString() + "}";
+        Microsoft.Win32.RegistryKey addinkey = hklm.CreateSubKey(keyname);
+        addinkey.SetValue(null, 0);
+
+        addinkey.SetValue("Description", att.Description);
+        addinkey.SetValue("Title", att.Title);
+
+        keyname = "Software\\SolidWorks\\AddInsStartup\\{" + t.GUID.ToString() + "}";
+        addinkey = hkcu.CreateSubKey(keyname);
+        addinkey.SetValue(null, Convert.ToInt32(att.LoadAtStartup), Microsoft.Win32.RegistryValueKind.DWord);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Error while registering the addin: " + ex.Message);
+    }
+}
+
+[ComUnregisterFunction]
+public static void UnregisterFunction(Type t)
+{
+    try
+    {
+        Microsoft.Win32.RegistryKey hklm = Microsoft.Win32.Registry.LocalMachine;
+        Microsoft.Win32.RegistryKey hkcu = Microsoft.Win32.Registry.CurrentUser;
+
+        string keyname = "SOFTWARE\\SolidWorks\\Addins\\{" + t.GUID.ToString() + "}";
+        hklm.DeleteSubKey(keyname);
+
+        keyname = "Software\\SolidWorks\\AddInsStartup\\{" + t.GUID.ToString() + "}";
+        hkcu.DeleteSubKey(keyname);
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine("Error while unregistering the addin: " + e.Message);
+    }
+}
+
+#endregion
+~~~
+
+
 
 ### Unregistering the add-in
 
@@ -72,16 +142,40 @@ To unregister the COM add-in it is required to call the [regsvr32](https://docs.
 
 To clear the registry values (unless it is done via the [ComUnregisterFunctionAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.interopservices.comunregisterfunctionattribute?view=netframework-4.0)) call the following registry file:
 
-{% code-snippet { file-name: remove-registry.reg } %}
+~~~ reg
+Windows Registry Editor Version 5.00
+
+[-HKEY_LOCAL_MACHINE\SOFTWARE\SolidWorks\Addins\{a377433e-f7cf-4a5a-9d74-b64c0c1758c2}]
+@=dword:00000001
+"Description"="Sample add-in description"
+"Title"="Sample add-in"
+
+[-HKEY_CURRENT_USER\Software\SolidWorks\AddInsStartup\{a377433e-f7cf-4a5a-9d74-b64c0c1758c2}]
+@=dword:00000001
+~~~
+
+
 
 ### Best practices
 
 Registration and unregistration commands can be placed into a single bat file to simplify the registration and unregistration process:
 
 *Register.bat*
-{% code-snippet { file-name: register.cmd } %}
+~~~ cmd
+"%windir%\Microsoft.NET\Framework64\v4.0.30319\RegAsm.exe" /codebase "%~dp0CodeStack.StockFit.Sw.dll"
+regedit.exe /S %~dp0add-registry.reg
+pause
+~~~
+
+
 
 *Unregister.bat*
-{% code-snippet { file-name: unregister.cmd } %}
+~~~ cmd
+"%windir%\Microsoft.NET\Framework64\v4.0.30319\RegAsm.exe" /codebase /u "%~dp0CodeStack.StockFit.Sw.dll"
+regedit.exe /S %~dp0remove-registry.reg
+pause
+~~~
+
+
 
 Change the name of the add-in and place these files into the bin folder and it will be only required to run this bat file on client machine.

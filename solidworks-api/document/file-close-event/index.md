@@ -34,10 +34,146 @@ To create a macro add 2 more modules into your VBA Editor:
 Paste the codes into the corresponding modules as follows:
 
 **FileWatcher Class Module**
-{% code-snippet { file-name: FileWatcher.vba } %}
+~~~ vb
+Public Event ModelClosed(path As String)
+Public Event ModelClosing(path As String)
+                         
+Dim WithEvents swApp As SldWorks.SldWorks
+
+Dim WithEvents swPart As SldWorks.PartDoc
+Dim WithEvents swAssy As SldWorks.AssemblyDoc
+Dim WithEvents swDraw As SldWorks.DrawingDoc
+
+Dim IsClosing As Boolean
+Dim ModelPath As String
+
+Sub WatchModelClose(model As SldWorks.ModelDoc2)
+    
+    IsClosing = False
+        
+    If Not model Is Nothing Then
+        Select Case model.GetType()
+            Case swDocumentTypes_e.swDocPART
+                Set swPart = model
+            Case swDocumentTypes_e.swDocASSEMBLY
+                Set swAssy = model
+            Case swDocumentTypes_e.swDocDRAWING
+                Set swDraw = model
+        End Select
+    Else
+        Err.Raise vbError, "", "Model is null"
+    End If
+    
+    ModelPath = model.GetPathName()
+    
+End Sub
+
+Private Sub Class_Initialize()
+    Set swApp = Application.SldWorks
+End Sub
+
+Private Function swApp_OnIdleNotify() As Long
+    
+    If IsClosing Then
+        IsClosing = False
+        RaiseEvent ModelClosed(ModelPath)
+    End If
+    
+    swApp_OnIdleNotify = 0
+    
+End Function
+
+Private Function swPart_DestroyNotify2(ByVal DestroyType As Long) As Long
+    swPart_DestroyNotify2 = HandleDestroyEvent(DestroyType)
+End Function
+
+Private Function swAssy_DestroyNotify2(ByVal DestroyType As Long) As Long
+    swAssy_DestroyNotify2 = HandleDestroyEvent(DestroyType)
+End Function
+
+Private Function swDraw_DestroyNotify2(ByVal DestroyType As Long) As Long
+    swDraw_DestroyNotify2 = HandleDestroyEvent(DestroyType)
+End Function
+
+Function HandleDestroyEvent(ByVal DestroyType As Long) As Long
+    
+    If DestroyType = swDestroyNotifyType_e.swDestroyNotifyDestroy Then
+        
+        RaiseEvent ModelClosing(ModelPath)
+        IsClosing = True
+                
+    End If
+    
+    HandleDestroyEvent = 0
+    
+End Function
+~~~
+
+
 
 **UserForm1 Form**
-{% code-snippet { file-name: UserForm1.vba } %}
+~~~ vb
+Dim WithEvents FileCloseWatcher As FileWatcher
+
+Private Sub FileCloseWatcher_ModelClosed(path As String)
+    CheckFileLockState "Post Close", path
+    End
+End Sub
+
+Private Sub FileCloseWatcher_ModelClosing(path As String)
+    CheckFileLockState "Pre Close", path
+End Sub
+
+Private Sub UserForm_Initialize()
+    
+    Dim swApp As SldWorks.SldWorks
+    
+    Set swApp = Application.SldWorks
+
+    Set FileCloseWatcher = New FileWatcher
+    
+    FileCloseWatcher.WatchModelClose swApp.ActiveDoc
+
+End Sub
+
+Sub CheckFileLockState(state As String, path As String)
+    Debug.Print "State: " & state & ". Unlocked: " & IsFileUnlocked(path)
+End Sub
+
+Function IsFileUnlocked(filePath As String) As Boolean
+    
+    IsFileUnlocked = False
+    
+    Dim fileNmb As Integer
+    
+    fileNmb = FreeFile
+    
+    On Error Resume Next
+    
+    Open filePath For Input Lock Read Write As #fileNmb
+    
+    If Err.Number = 0 Then
+        IsFileUnlocked = True
+    End If
+    
+    Close fileNmb
+    
+End Function
+~~~
+
+
 
 **Macro Module**
-{% code-snippet { file-name: Macro.vba } %}
+~~~ vb
+Dim swApp As SldWorks.SldWorks
+
+Sub main()
+
+    Set swApp = Application.SldWorks
+    
+    UserForm1.Show vbModeless
+    
+End Sub
+~~~
+
+

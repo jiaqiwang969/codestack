@@ -12,7 +12,7 @@ The following error is displayed when .NET add-in is added to the vault via PDM 
 
 ![Error when adding add-in to the PDM vault](class-id-not-found-in-registry.png){ width=450 }
 
-Add-in works correctly while [debugging](/solidworks-pdm-api/getting-started/add-ins/debugging-best-practices/)
+Add-in works correctly while [debugging](/docs/codestack/solidworks-pdm-api/getting-started/add-ins/debugging-best-practices/)
 
 ## Cause
 

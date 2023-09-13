@@ -241,9 +241,9 @@ Sub main()
 
 ## Referencing 3rd Party Type Libraries
 
-When just few objects or functions from the 3rd party type library are used (e.g. Microsoft Scripting Runtime, Microsoft Excel, etc.) and this is not a primary target of automation, consider using them with [Late Binding](/visual-basic/variables/declaration#late-binding) instead of an [Early Binding](/visual-basic/variables/declaration#early-binding)
+When just few objects or functions from the 3rd party type library are used (e.g. Microsoft Scripting Runtime, Microsoft Excel, etc.) and this is not a primary target of automation, consider using them with [Late Binding](/docs/codestack/visual-basic/variables/declaration#late-binding) instead of an [Early Binding](/docs/codestack/visual-basic/variables/declaration#early-binding)
 
-For example Excel VBA macro needs to create a [dictionary](/visual-basic/data-sets/dictionary/) object to hold key-value pairs. Instead of referring the *Microsoft Scripting Runtime* reference and using the following code
+For example Excel VBA macro needs to create a [dictionary](/docs/codestack/visual-basic/data-sets/dictionary/) object to hold key-value pairs. Instead of referring the *Microsoft Scripting Runtime* reference and using the following code
 
 ~~~ vb
 Dim dict As Scripting.Dictionary
@@ -259,7 +259,7 @@ Set dict = CreateObject("Scripting.Dictionary")
 
 Another example is SOLIDWORKS VBA macro, which primarily automates SOLIDWORKS, while some Excel API invocation might be required. In this case Excel can be created as late bound object and no references to Excel library need to be added to the macro.
 
-This approach allows to simplify the compatibility between different versions of library and avoid [missing references issue](/solidworks-api/troubleshooting/macros/missing-solidworks-type-library-references/)
+This approach allows to simplify the compatibility between different versions of library and avoid [missing references issue](/docs/codestack/solidworks-api/troubleshooting/macros/missing-solidworks-type-library-references/)
 
 > Late binding has a limitation and some of the methods cannot be invoked with late binding, in this case early binding is an only option
 
@@ -279,7 +279,7 @@ Else
 End If
 ~~~
 
-On the other hand *GetTitle* function below, runs a custom code to find the title of the document. It is assumed that regardless of the circumstances, title can never be an empty string, so empty string returned from *GetTitle* indicates the logic error. Assert would be thrown if its condition is False (title <> "").
+On the other hand *GetTitle* function below, runs a custom code to find the title of the document. It is assumed that regardless of the circumstances, title can never be an empty string, so empty string returned from *GetTitle* indicates the logic error. Assert would be thrown if its condition is False (title  "").
 
 ~~~ vb
 Dim title As String

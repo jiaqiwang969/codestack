@@ -31,7 +31,41 @@ By default eDrawings API doesn't provide the .NET control to be hosted on the Wi
 
 ### eDrawingHost.cs
 
-{% code-snippet { file-name: eDrawingHost.cs } %}
+~~~ cs
+using eDrawings.Interop.EModelViewControl;
+using System;
+using System.Windows.Forms;
+
+namespace CodeStack.Examples.eDrawings
+{
+    public class eDrawingHost : AxHost
+    {
+        public event Action<EModelViewControl> ControlLoaded;
+
+        private bool m_IsLoaded;
+
+        public eDrawingHost() : base("22945A69-1191-4DCF-9E6F-409BDE94D101")
+        {
+            m_IsLoaded = false;
+        }
+
+        protected override void OnCreateControl()
+        {
+            base.OnCreateControl();
+
+            if (!m_IsLoaded)
+            {
+                m_IsLoaded = true;
+                var ctrl = this.GetOcx() as EModelViewControl;
+                ControlLoaded?.Invoke(this.GetOcx() as EModelViewControl);
+            }
+        }
+    }
+}
+
+~~~
+
+
 
 > eDrawings control is not loaded immediately and calling the [AxHost::GetOcx](https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.axhost.getocx) directly after the constructor will result in null reference. Calling this method when control is not fully loaded might result into the deadlock.
 
@@ -49,6 +83,49 @@ Add the following code to the form code behind. Set the path to the SOLIDWORKS f
 
 ### MainForm.cs
 
-{% code-snippet { file-name: MainForm.cs } %}
+~~~ cs
+using eDrawings.Interop.EModelViewControl;
+using System;
+using System.Diagnostics;
+using System.Windows.Forms;
+
+namespace CodeStack.Examples.eDrawings
+{
+    public partial class MainForm : Form
+    {
+        private const string FILE_PATH = @"D:\Box.sldprt";
+
+        public MainForm()
+        {
+            InitializeComponent();
+
+            var host = new eDrawingHost();
+            host.ControlLoaded += OnControlLoaded;
+            this.Controls.Add(host);
+            host.Dock = DockStyle.Fill;
+        }
+
+        private void OnControlLoaded(EModelViewControl ctrl)
+        {
+            ctrl.OnFinishedLoadingDocument += OnFinishedLoadingDocument;
+            ctrl.OnFailedLoadingDocument += OnFailedLoadingDocument;
+            ctrl.OpenDoc(FILE_PATH, false, false, false, "");
+        }
+
+        private void OnFailedLoadingDocument(string fileName, int errorCode, string errorString)
+        {
+            Trace.WriteLine($"{fileName} failed to loaded: {errorString}");
+        }
+
+        private void OnFinishedLoadingDocument(string fileName)
+        {
+            Trace.WriteLine($"{fileName} loaded");
+        }
+    }
+}
+
+~~~
+
+
 
 Source code is available on [GitHub](https://github.com/codestackdev/solidworks-api-examples/tree/master/edrawings-api/eDrawingsWinFormsHost)

@@ -18,6 +18,6 @@ Once e-mail is verified the warning is removed:
 
 ![Validated E-Mail forwarding record](email-verified.png)
 
-Unlike [forwarding with GoDaddy](/hosting/email/godaddy-email-forwarding/), Google Domains enables the encryption for the forwarded e-mails:
+Unlike [forwarding with GoDaddy](/docs/codestack/hosting/email/godaddy-email-forwarding/), Google Domains enables the encryption for the forwarded e-mails:
 
 ![Received e-mail with encryption](secure-email.png)

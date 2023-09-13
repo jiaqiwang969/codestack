@@ -11,4 +11,28 @@ This example demonstrates how to list all available vault views and their paths 
 
 [IEdmVault8::GetVaultViews](https://help.solidworks.com/2018/english/api/epdmapi/epdm.interop.epdm~epdm.interop.epdm.iedmvault8~getvaultviews.html) SOLIDWORKS PDM API is used to list the information about all available PDM vaults. Alternatively this information can be retrieved from the Registry.
 
-{% code-snippet { file-name: Console.cs } %}
+~~~ cs
+using EPDM.Interop.epdm;
+using System;
+
+namespace CodeStack.ListPdmVaults
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var vault = new EdmVault5Class();
+            EdmViewInfo[] views;
+            vault.GetVaultViews(out views, false);
+
+            foreach (var view in views)
+            {
+                Console.WriteLine($"{view.mbsVaultName}:{view.mbsPath}");
+            }
+        }
+    }
+}
+
+~~~
+
+

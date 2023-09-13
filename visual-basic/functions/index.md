@@ -23,7 +23,7 @@ Function <Name>(<Optional Parameters>) As <Type>
 End Function
 ~~~
 
-Type of the function should be defined after the **As** keyword. If type is not explicitly specified than it is considered to be [Variant](visual-basic/variables/standard-types#variant)
+Type of the function should be defined after the **As** keyword. If type is not explicitly specified than it is considered to be [Variant](/docs/codestack/visual-basic/variables/standard-types#variant)
 
 Subroutine is declared within the **Sub**-**End Sub** block
 
@@ -57,7 +57,7 @@ Call Func1()  'using () while calling using Call operator
 
 ## Returning values
 
-In order to return the value from function is is required to consider its name as variable and follow the same rules as while [assigning the variables values](visual-basic/variables/)
+In order to return the value from function is is required to consider its name as variable and follow the same rules as while [assigning the variables values](/docs/codestack/visual-basic/variables/)
 
 ~~~ vb
 Function GetDouble() As Double
@@ -114,7 +114,56 @@ End Function
 
 Example below demonstrates cases where the optional parameters can be used.
 
-{% code-snippet { file-name: optional-parameters.vba } %}
+~~~ vb
+Sub main()
+    
+    Debug.Print Pow(2) '4
+    Debug.Print Pow(2, 3) '8
+
+    PrintAddress state:="NSW", postcode:=2000 'Australia NSW 2000
+    
+End Sub
+
+Function Pow(number As Double, Optional power As Double = 2) As Double
+    
+    Pow = number ^ power
+    
+End Function
+
+Sub PrintAddress(Optional country As String = "Australia", Optional state As String = "", Optional suburb As String = "", Optional postcode As Integer = 0, Optional streetName As String = "", Optional buildingNumber As Integer = 0, Optional unitNumber As Integer = 0)
+
+    If country <> "" Then
+        Debug.Print country
+    End If
+    
+    If state <> "" Then
+        Debug.Print state
+    End If
+    
+    If suburb <> "" Then
+        Debug.Print suburb
+    End If
+    
+    If postcode > 0 Then
+        Debug.Print postcode
+    End If
+    
+    If streetName <> "" Then
+        Debug.Print streetName
+    End If
+    
+    If buildingNumber > 0 Then
+        Debug.Print buildingNumber
+    End If
+    
+    If unitNumber > 0 Then
+        Debug.Print "Unit: " & unitNumber
+    End If
+    
+End Sub
+~~~
+
+
 
 ## Terminating function and subroutine
 
@@ -122,4 +171,59 @@ Function and subroutine can be terminated and control returned to the caller at 
 
 Example below demonstrates different cases of using functions and subroutines.
 
-{% code-snippet { file-name: declaration-calling.vba } %}
+~~~ vb
+Sub main()
+    
+    'prints ProcedureWithoutParameters twice
+    ProcedureWithoutParameters
+    ProcedureWithoutParameters
+    
+    'Compile error: Argument not optional
+    'SayHello
+    
+    'Hello, Test
+    SayHello "Test"
+    
+    Dim formDate As String
+    FormatDate "dd-MM-yyyy", formDate
+    
+    '20-06-2018
+    Debug.Print formDate
+    
+    '20-06-2018
+    Debug.Print GetFormattedDate("dd-MM-yyyy")
+    
+End Sub
+
+Sub ProcedureWithoutParameters()
+    
+    Debug.Print "ProcedureWithoutParameters"
+
+End Sub
+
+Sub SayHello(name As String)
+    
+    Debug.Print "Hello, " & name
+
+End Sub
+
+Sub FormatDate(dateFormat As String, ByRef formattedDate As String)
+    
+    Dim curDate As Date
+    curDate = Now
+    
+    formattedDate = format(curDate, dateFormat)
+    
+End Sub
+
+Function GetFormattedDate(dateFormat As String) As String
+    
+    Dim curDate As Date
+    curDate = Now
+    
+    GetFormattedDate = format(curDate, dateFormat)
+    
+End Function
+~~~
+
+

@@ -29,4 +29,58 @@ Const PART_NUMBER_SRC As Integer = swBOMPartNumberSource_e.swBOMPartNumber_Confi
 Const CHILD_COMPS_DISP As Integer = swChildComponentInBOMOption_e.swChildComponent_Promote 'Display of components in BOM: -1 to keep as is or swChildComponentInBOMOption_e.swChildComponent_Show, swChildComponentInBOMOption_e.swChildComponent_Hide or swChildComponentInBOMOption_e.swChildComponent_Promote
 ~~~
 
-{% code-snippet { file-name: Macro.vba } %}
+~~~ vb
+Const ALL_CONFIGS As Boolean = True
+Const PART_NUMBER_SRC As Integer = swBOMPartNumberSource_e.swBOMPartNumber_ConfigurationName
+Const CHILD_COMPS_DISP As Integer = swChildComponentInBOMOption_e.swChildComponent_Promote
+
+Dim swApp As SldWorks.SldWorks
+
+Sub main()
+
+    Set swApp = Application.SldWorks
+    
+    Dim swModel As SldWorks.ModelDoc2
+    
+    Set swModel = swApp.ActiveDoc
+    
+    If swModel Is Nothing Then
+        Err.Raise vbError, "", "Open document"
+    End If
+    
+    If swModel.GetType() = swDocumentTypes_e.swDocDRAWING Then
+        Err.Raise vbError, "", "Drawings are not supported"
+    End If
+    
+    If ALL_CONFIGS Then
+        
+        Dim vConfNames As Variant
+        
+        vConfNames = swModel.GetConfigurationNames
+        Dim i As Integer
+        
+        For i = 0 To UBound(vConfNames)
+            Dim swConf As SldWorks.Configuration
+            Set swConf = swModel.GetConfigurationByName(CStr(vConfNames(i)))
+            SetConfigurationBomOptions swConf
+        Next
+        
+    Else
+        SetConfigurationBomOptions swModel.ConfigurationManager.ActiveConfiguration
+    End If
+    
+End Sub
+
+Sub SetConfigurationBomOptions(config As SldWorks.Configuration)
+    
+    If CHILD_COMPS_DISP <> -1 Then
+        config.ChildComponentDisplayInBOM = CHILD_COMPS_DISP
+    End If
+    
+    If PART_NUMBER_SRC <> -1 Then
+        config.BOMPartNoSource = PART_NUMBER_SRC
+    End If
+    
+End Sub
+~~~
+

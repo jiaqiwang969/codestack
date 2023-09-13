@@ -22,4 +22,22 @@ Code will automatically create new file if it doesn't exist.
 
 Exception will be thrown in case of any error (for example file cannot be accessed for writing).
 
-{% code-snippet { file-name: WriteText.vba } %}
+~~~ vb
+Sub WriteText(filePath As String, content As String, append As Boolean)
+    
+    Dim fileNo As Integer
+    fileNo = FreeFile
+    
+    If append Then
+        Open filePath For Append As #fileNo
+    Else
+        Open filePath For Output As #fileNo
+    End If
+    
+    Print #fileNo, content
+    
+    Close #fileNo
+    
+End Sub
+~~~
+

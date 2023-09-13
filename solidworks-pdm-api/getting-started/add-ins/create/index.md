@@ -65,7 +65,17 @@ Add-in dlls will be loaded into several processes (including *explorer.exe*) on 
 
 This message means that cached (previous) version of PDM add-in will be in use until the dlls are unlocked. Instead of restarting the machine it is possible to kill all processes which are locking the dlls. You can use the following command line script to release add-in with a single command:
 
-{% code-snippet { file-name: UnloadPdmClient.cmd } %}
+~~~ cmd
+TASKKILL /F /IM explorer.exe
+TASKKILL /F /IM EdmServer.exe
+TASKKILL /F /IM ConisioAdmin.exe
+TASKKILL /F /IM AddInSrv.exe
+
+START explorer.exe
+
+~~~
+
+
 
 SOLIDWORKS PDM provides handy functionality which simplifies the debugging of PDM add-in.
 Please read the following article: [Debugging SOLIDWORKS PDM Add-In - Best Practices](../debugging-best-practices)  

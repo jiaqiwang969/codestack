@@ -8,7 +8,7 @@ order: 2
 ---
 ![Angular package file](angular-package.png){ width=400 }
 
-Once you create new Angular application, you will see package.json file among the newly created files and folders. package.json file locates in project root and contains information about your web application. The main purpose of the file comes from its name *package*, so it'll contain the information about npm packages installed for the project.<br>
+Once you create new Angular application, you will see package.json file among the newly created files and folders. package.json file locates in project root and contains information about your web application. The main purpose of the file comes from its name *package*, so it'll contain the information about npm packages installed for the project.
 
 Let's take a look at main sections in package.json file.
 
@@ -34,12 +34,12 @@ Field         | Value                          | Description
 --------------|--------------------------------|-----------
 "description" | "Some project description"     |
 "main"        | "src/main.ts"                  | Entry point in the app. "src/main.ts" is default value for Angular application
-"author"      | "Name, name@email.com, https://name.com"<br>or<br>"author": { <br> "name":"Name",<br>"email":"name@email.com",<br>"url":"https://name.com"} | Set all in one plain string <br> or <br> using the structure
-"contributors"| ["Contributor, contributor@email.com, https://contributor.com"]<br>or<br>"contributors": [{<br>"name": "Contributor",<br>"email": "contributor@email.com",<br>"url": "https://contributor.com"<br>}]<br>  | You can add contributors information as string array<br>or<br>using the structure array
+"author"      | "Name, name@email.com, https://name.com" or "author": {   "name":"Name","email":"name@email.com", "url":"https://name.com"} | Set all in one plain string   or   using the structure
+"contributors"| ["Contributor, contributor@email.com, https://contributor.com"] or "contributors": [{ "name": "Contributor", "email": "contributor@email.com", "url": "https://contributor.com" }]   | You can add contributors information as string array or using the structure array
 "bugs"        | "https://github.com/UserName/my-first-angular-app/issues"  | Link to bug tracking system, if any
 "homepage"    | "https://site-name.com"                               | Link to homepage
 "license"     | "MIT"                                                 | License of the application
-"repository"  | "{"type": "git",<br> "url": "https://github.com/UserName/my-first-angular-app.git"}"                   | Repository location
+"repository"  | "{"type": "git",  "url": "https://github.com/UserName/my-first-angular-app.git"}"                   | Repository location
 
 ## Scripts
 
@@ -84,10 +84,10 @@ The list of packages installed as dependencies for this project are required at 
 },
 ~~~
 
-Where **@angular/animations** is package name and **~8.0.0** is package version. You may notice that package versions description vary. The symbol in front of version says to npm install which package version to use<br>
-**1.0.0** means strictly 1.0.0 version of the package<br>
-**~8.0.0** means, 8.0.0 version or it's later patch version (third number may vary): 8.0, 8.0.x<br>
-**^1.9.0** means, 1.9.0 version or it's later minor version (second number may vary): 1, 1.x <br>
+Where **@angular/animations** is package name and **~8.0.0** is package version. You may notice that package versions description vary. The symbol in front of version says to npm install which package version to use 
+**1.0.0** means strictly 1.0.0 version of the package 
+**~8.0.0** means, 8.0.0 version or it's later patch version (third number may vary): 8.0, 8.0.x 
+**^1.9.0** means, 1.9.0 version or it's later minor version (second number may vary): 1, 1.x  
 
 Other version control symbols:
 

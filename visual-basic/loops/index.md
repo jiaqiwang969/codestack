@@ -4,7 +4,7 @@ title: Usage of for, while, for each, do loops in Visual Basic
 description: Article explaining loops (while-wend, for-next, for each-next, do-while) and traversing techniques
 order: 6
 ---
-Loops in programming is a technique to iterate over the elements of [collections](/visual-basic/data-sets/collection/) and [arrays](/visual-basic/data-sets/array/) and other data sets.
+Loops in programming is a technique to iterate over the elements of [collections](/docs/codestack/visual-basic/data-sets/collection/) and [arrays](/docs/codestack/visual-basic/data-sets/array/) and other data sets.
 
 The following sections explains different types of loops. All the below snippets based on a simple array of *String* which is declared below:
 

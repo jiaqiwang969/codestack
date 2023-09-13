@@ -8,7 +8,7 @@ order: 2
 Framework provides 3 main macro feature abstract classes which reside in the [CodeStack.SwEx.MacroFeature](https://docs.codestack.net/swex/macro-feature/html/N_CodeStack_SwEx_MacroFeature.htm) namespace to be inherited in order to register new macro feature.
 
 * [MacroFeatureEx](https://docs.codestack.net/swex/macro-feature/html/T_CodeStack_SwEx_MacroFeature_MacroFeatureEx.htm) - simple macro feature. Macro feature doesn't require any parameters and will performa a simle operation
-* [MacroFeatureEx{TParams}](https://docs.codestack.net/swex/macro-feature/html/T_CodeStack_SwEx_MacroFeature_MacroFeatureEx_1.htm) parameters driven macro feature. All of the required inputs can be defined within the *TParams* structure (data model). [Macro feature data](\labs\solidworks\swex\macro-feature\data) includes
+* [MacroFeatureEx{TParams}](https://docs.codestack.net/swex/macro-feature/html/T_CodeStack_SwEx_MacroFeature_MacroFeatureEx_1.htm) parameters driven macro feature. All of the required inputs can be defined within the *TParams* structure (data model). [Macro feature data](/docs/codestack/labs/solidworks/swex/macro-feature/data) includes
     * Field Values (Named parameters)
     * Dimensions
     * Selections
@@ -19,7 +19,34 @@ Macro feature class must be com visible.
 
 It is recommended to explicitly assign guid and prog id for the macro feature.
 
-{% code-snippet { file-name: DefiningMacroFeature.cs } %}
+~~~ cs
+using CodeStack.SwEx.MacroFeature;
+using CodeStack.SwEx.MacroFeature.Attributes;
+using CodeStack.SwEx.Properties;
+using SolidWorks.Interop.swconst;
+using System;
+using System.Runtime.InteropServices;
+
+namespace CodeStack.SwEx
+{
+    public class MySimplaeMacroFeatureParameters
+    {
+        public string Parameter1 { get; set; }
+    }
+
+    [ComVisible(true)]
+    [Guid("47827004-8897-49F5-9C65-5B845DC7F5AC")]
+    [ProgId("CodeStack.MyMacroFeature")]
+    [Options("MyMacroFeature", swMacroFeatureOptions_e.swMacroFeatureAlwaysAtEnd)]
+    [FeatureIcon(typeof(Resources), nameof(Resources.macro_feature_icon), "CodeStack\\MyMacroFeature\\Icons")]
+    public class MySimplaeMacroFeature : MacroFeatureEx<MySimplaeMacroFeatureParameters>
+    {
+    }
+}
+
+~~~
+
+
 
 ## Icon
 
@@ -33,7 +60,23 @@ Macro feature is a COM object which means it needs to be registered in order for
 
 User can specify the custom message to be displayed in the *What's Wrong* dialog via *provider* parameter of [OptionsAttribute](https://docs.codestack.net/swex/macro-feature/html/T_CodeStack_SwEx_MacroFeature_Attributes_OptionsAttribute.htm). Specified message will be displayedafter the predefined *Add-in not found. Please contact*
 
-{% code-snippet { file-name: UnregisteredMacroFeature.cs } %}
+~~~ cs
+using CodeStack.SwEx.MacroFeature;
+using CodeStack.SwEx.MacroFeature.Attributes;
+using System.Runtime.InteropServices;
+
+namespace CodeStack.SwEx
+{
+    [ComVisible(true)]
+    [Options("SwExMacroFeature", "CodeStack. Download the add-in")]
+    public class UnregisteredMacroFeature : MacroFeatureEx
+    {
+    }
+}
+
+~~~
+
+
 
 ![Rebuild error message for unregistered macro feature](unregistered-macro-feature.png){ width=650 }
 

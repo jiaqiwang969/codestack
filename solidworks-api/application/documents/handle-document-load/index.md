@@ -32,22 +32,81 @@ Sub main(model As SldWorks.ModelDoc2)
 End Sub
 ~~~
 
-* It might be useful to automatically run this macro with each session of SOLIDWORKS. Follow the [Run SOLIDWORKS macro automatically on application start](solidworks-api/getting-started/macros/run-macro-on-solidworks-start/) link for more information.
+* It might be useful to automatically run this macro with each session of SOLIDWORKS. Follow the [Run SOLIDWORKS macro automatically on application start](/docs/codestack/solidworks-api/getting-started/macros/run-macro-on-solidworks-start/) link for more information.
 
 ## Macro Module
 
 Entry point which starts events monitoring
 
-{% code-snippet { file-name: Macro.vba } %}
+~~~ vb
+Dim swFileLoadWatcher As FileLoadWatcher
+
+Sub main()
+    
+    Set swFileLoadWatcher = New FileLoadWatcher
+    
+    While True
+        DoEvents
+    Wend
+    
+End Sub
+~~~
+
+
 
 ## FileLoadWatcher Class Module
 
 Class which handles SOLIDWORKS API notifications
 
-{% code-snippet { file-name: FileLoadWatcher.vba } %}
+~~~ vb
+Dim WithEvents swApp As SldWorks.SldWorks
+
+Private Sub Class_Initialize()
+    Set swApp = Application.SldWorks
+End Sub
+
+Private Function swApp_DocumentLoadNotify2(ByVal docTitle As String, ByVal docPath As String) As Long
+    
+    Dim swModel As SldWorks.ModelDoc2
+        
+    If docPath <> "" Then
+        Set swModel = swApp.GetOpenDocumentByName(docPath)
+    Else
+        Dim vDocs As Variant
+        vDocs = swApp.GetDocuments
+        
+        Dim i As Integer
+        
+        For i = 0 To UBound(vDocs)
+            Dim swDoc As SldWorks.ModelDoc2
+            Set swDoc = vDocs(i)
+            If swDoc.GetTitle() = docTitle Then
+                Set swModel = swDoc
+                Exit For
+            End If
+        Next
+    End If
+    
+    OnModelLoad swModel
+    
+End Function
+
+Sub OnModelLoad(model As SldWorks.ModelDoc2)
+    HandlerModule.main model
+End Sub
+~~~
+
+
 
 ## HandlerModule Module
 
 Custom VBA code which needs to be run for each opened document
 
-{% code-snippet { file-name: HandlerModule.vba } %}
+~~~ vb
+Sub main(model As SldWorks.ModelDoc2)
+    'TODO:implement the procedure
+    MsgBox "File Loaded: " & model.GetTitle()
+End Sub
+~~~
+
+

@@ -4,7 +4,7 @@ title: Properties in Visual Basic
 description: Article explaining usage (declaring, setting and reading the values) of properties in Visual Basic. Difference between properties and variables
 order: 14
 ---
-Properties have a very similar use to [variables](/visual-basic/variables/declaration/) when it comes to consuming of the property
+Properties have a very similar use to [variables](/docs/codestack/visual-basic/variables/declaration/) when it comes to consuming of the property
 
 ~~~ vb jagged
 Set myObj = Property1 'assigning the reference value from the property to the variable
@@ -17,7 +17,7 @@ The above code would look exactly the same if Property1, Property2, Property3 an
 
 ![Intellisense for property and variable](property-intellisense.png)
 
-However properties declarations are more similar to [functions](/visual-basic/functions/).
+However properties declarations are more similar to [functions](/docs/codestack/visual-basic/functions/).
 
 ## Types Of Properties
 
@@ -51,7 +51,25 @@ Read-write properties is a combination of read and write capabilities within a s
 
 Declaration of read and write properties must have the same name and have the same type, i.e. type of the parameter in the write property must match the type of the return value in read property, otherwise the *Definitions of property procedures for the same property are inconsistent, or property procedure has an optional parameter, a ParamArray or invalid Set final parameter* compile time error will be thrown
 
-{% code-snippet { file-name: MacroError.vba } %}
+~~~ vb
+Property Get Prop1() As Integer
+    Prop1 = Prop1
+End Property
+
+Property Let Prop1(val As String)
+    Debug.Print val
+End Property
+
+Property Get Prop2()
+    Prop2 = "Prop2 Value"
+End Property
+
+Property Let Prop2(val As String) 'invalid as implicitly assigned type is Variant
+    Debug.Print val
+End Property
+~~~
+
+
 
 ![Inconsistent property error](inconsistent-property-error.png)
 

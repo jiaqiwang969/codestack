@@ -22,7 +22,98 @@ It is required to always use the pointer to active assembly document ([ISldWorks
 
 For example to insert the extruded feature into the part document from the image above which is edited in the context the [IFeatureManager::FeatureExtrusion2](https://help.solidworks.com/2012/english/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.IFeatureManager~FeatureExtrusion2.html) must be called on the [IModelDoc2](https://help.solidworks.com/2012/english/api/sldworksapi/solidworks.interop.sldworks~solidworks.interop.sldworks.imodeldoc2_methods.html) which is an active assembly but not the model of the component being edited.
 
-{% code-snippet { file-name: CreateExtrudeFeatureInAssemblyContext.vba } %}
+~~~ vb
+Dim swApp As SldWorks.SldWorks
+
+Sub main()
+
+    Set swApp = Application.SldWorks
+
+    Dim swAssy As SldWorks.AssemblyDoc
+    
+    Set swAssy = swApp.ActiveDoc
+    
+    If Not swAssy Is Nothing Then
+        
+        Dim swComp As SldWorks.Component2
+        
+        swAssy.InsertNewVirtualPart Nothing, swComp
+        
+        swComp.Select4 False, Nothing, False
+        
+        swAssy.EditPart
+        
+        Debug.Assert swComp.GetModelDoc2() Is swAssy.GetEditTarget() 'current editing model equals to the component's model
+        Debug.Assert Not swComp.GetModelDoc2() Is swAssy 'component's model doesn't equal to the assembly model
+        
+        Dim swRefPlaneFeat As SldWorks.Feature
+        Set swRefPlaneFeat = FindStandardPlane(swComp)
+        
+        Dim swSketchFeat As SldWorks.Feature
+        
+        'Creating circle in the context of the current editing model via the main assembly model
+        Set swSketchFeat = CreateCircle(swRefPlaneFeat, swAssy)
+        
+        'Creating extrude in the context of the current editing model via the main assembly model
+        CreateExtrude swSketchFeat, swAssy
+        
+        swAssy.EditAssembly
+        swAssy.EditRebuild
+        
+    Else
+        MsgBox "Please open assembly"
+    End If
+
+End Sub
+
+Function FindStandardPlane(comp As SldWorks.Component2) As SldWorks.Feature
+    
+    Dim swCompModel As SldWorks.ModelDoc2
+    Set swCompModel = comp.GetModelDoc2
+    
+    Dim i As Integer
+    i = 1
+    Dim swRefPlaneFeat As SldWorks.Feature
+    
+    Do
+        Set swRefPlaneFeat = swCompModel.FeatureByPositionReverse(i)
+        i = i + 1
+    Loop While swRefPlaneFeat.GetTypeName2() <> "RefPlane"
+    
+    'converting the pointer of the feature into the assembly context so it can be selected in the assembly
+    Set FindStandardPlane = comp.GetCorresponding(swRefPlaneFeat)
+    
+End Function
+
+Function CreateCircle(plane As SldWorks.Feature, model As SldWorks.ModelDoc2) As SldWorks.Feature
+    
+    plane.Select2 False, -1
+    
+    model.SketchManager.InsertSketch True
+    model.SketchManager.AddToDB = True
+    
+    Set CreateCircle = model.SketchManager.ActiveSketch
+    
+    model.ClearSelection2 True
+    model.SketchManager.CreateCircleByRadius 0, 0, 0, 0.01
+    model.SketchManager.AddToDB = False
+    
+    model.ClearSelection2 True
+    model.SketchManager.InsertSketch True
+    
+End Function
+
+Sub CreateExtrude(sketch As SldWorks.Feature, model As SldWorks.ModelDoc2)
+    
+    sketch.Select2 False, 0
+    
+    model.FeatureManager.FeatureExtrusion2 True, False, False, 0, 0, 0.01, 0.01, False, False, False, False, 0, 0, False, False, False, False, True, True, True, 0, 0, False
+    model.ClearSelection2 True
+    
+End Sub
+~~~
+
+
 
 ## Converting the pointers
 
@@ -54,7 +145,62 @@ These pointers are safe to work with within the context of this assembly. For ex
 * Select the *3DSketch1* feature in the tree
 * Run the following macro
 
-{% code-snippet { file-name: AssemblyContext.vba } %}
+~~~ vb
+Dim swApp As SldWorks.SldWorks
+
+Sub main()
+
+    Set swApp = Application.SldWorks
+    
+    Dim swAssy As SldWorks.AssemblyDoc
+    
+    Set swAssy = swApp.ActiveDoc
+    
+    If Not swAssy Is Nothing Then
+    
+        Dim swFeat As SldWorks.Feature
+        Set swFeat = swAssy.SelectionManager.GetSelectedObject6(1, -1)
+        
+        MoveSketchPoints swFeat, swAssy
+    
+        'exit edit in context model
+        swAssy.ClearSelection2 True
+        swAssy.EditAssembly
+        
+    Else
+        MsgBox "Please open assembly document"
+    End If
+    
+End Sub
+
+Sub MoveSketchPoints(sketchFeat As SldWorks.Feature, editModel As SldWorks.ModelDoc2)
+    
+    Dim swSketch As SldWorks.Sketch
+    Set swSketch = sketchFeat.GetSpecificFeature2
+    
+    Debug.Print "Sketch Feature Selected: " & sketchFeat.Select2(False, -1)
+    
+    editModel.SketchManager.Insert3DSketch True
+    
+    Dim vSkPts As Variant
+    vSkPts = swSketch.GetSketchPoints2()
+    
+    Dim i As Integer
+    
+    For i = 0 To UBound(vSkPts)
+        Dim swSkPt As SldWorks.SketchPoint
+        Set swSkPt = vSkPts(i)
+        swSkPt.X = swSkPt.X + 0.01
+        swSkPt.Y = swSkPt.Y + 0.01
+        swSkPt.Z = swSkPt.Z + 0.01
+    Next
+    
+    editModel.SketchManager.Insert3DSketch True
+    
+End Sub
+~~~
+
+
 
 As the result sketch point is moved by 10 mm in XYZ directions.
 
@@ -70,7 +216,71 @@ The following example demonstrates the result of using out of context pointers b
 
 Follow the steps from previous test case and run the following macro
 
-{% code-snippet { file-name: ComponentModelContext.vba } %}
+~~~ vb
+Dim swApp As SldWorks.SldWorks
+
+Sub main()
+
+    Set swApp = Application.SldWorks
+    
+    Dim swAssy As SldWorks.AssemblyDoc
+    
+    Set swAssy = swApp.ActiveDoc
+    
+    If Not swAssy Is Nothing Then
+    
+        Dim swFeat As SldWorks.Feature
+        Set swFeat = swAssy.SelectionManager.GetSelectedObject6(1, -1)
+        
+        Dim swComp As SldWorks.Component2
+        Set swComp = swFeat.GetComponent
+    
+        Dim swCorrFeat As SldWorks.Feature
+        Dim swCompModel As SldWorks.ModelDoc2
+        Set swCompModel = swComp.GetModelDoc2
+        Set swCorrFeat = swCompModel.Extension.GetCorresponding(swFeat)
+        
+        Dim swCorrFeatByName As SldWorks.Feature
+        Set swCorrFeatByName = swCompModel.FeatureByName(swFeat.Name)
+        
+        Debug.Print "Pointers are equal: " & (swCorrFeat Is swCorrFeatByName)
+        
+        MoveSketchPoints swCorrFeat, swCompModel
+        
+    Else
+        MsgBox "Please open assembly document"
+    End If
+    
+End Sub
+
+Sub MoveSketchPoints(sketchFeat As SldWorks.Feature, editModel As SldWorks.ModelDoc2)
+    
+    Dim swSketch As SldWorks.Sketch
+    Set swSketch = sketchFeat.GetSpecificFeature2
+    
+    Debug.Print "Sketch Feature Selected: " & sketchFeat.Select2(False, -1)
+    
+    editModel.SketchManager.Insert3DSketch True
+    
+    Dim vSkPts As Variant
+    vSkPts = swSketch.GetSketchPoints2()
+    
+    Dim i As Integer
+    
+    For i = 0 To UBound(vSkPts)
+        Dim swSkPt As SldWorks.SketchPoint
+        Set swSkPt = vSkPts(i)
+        swSkPt.X = swSkPt.X + 0.01
+        swSkPt.Y = swSkPt.Y + 0.01
+        swSkPt.Z = swSkPt.Z + 0.01
+    Next
+    
+    editModel.SketchManager.Insert3DSketch True
+    
+End Sub
+~~~
+
+
 
 As the result sketch points are not moved despite the output window displays the success
 
@@ -98,7 +308,73 @@ In many cases the initial pointer is available in the context of the underlying 
 * Select the *3DSketch1* in the active part document
 * Run the following macro
 
-{% code-snippet { file-name: ComponentModelToAssemblyContext.vba } %}
+~~~ vb
+Dim swApp As SldWorks.SldWorks
+
+Sub main()
+
+    Set swApp = Application.SldWorks
+    
+    Dim swModel As SldWorks.ModelDoc2
+    
+    Set swModel = swApp.ActiveDoc
+    
+    If Not swModel Is Nothing Then
+    
+        Dim swFeat As SldWorks.Feature
+        Set swFeat = swModel.SelectionManager.GetSelectedObject6(1, -1)
+        
+        Stop 'Activate assembly and select the component
+        
+        Dim swAssy As SldWorks.AssemblyDoc
+        Set swAssy = swApp.ActiveDoc
+        
+        Dim swComp As SldWorks.Component2
+        Set swComp = swAssy.SelectionManager.GetSelectedObjectsComponent4(1, -1)
+        Dim swCompFeat As SldWorks.Feature
+        Set swCompFeat = swComp.GetCorresponding(swFeat)
+        
+        Dim swCompFeatByName As SldWorks.Feature
+        Set swCompFeatByName = swComp.FeatureByName(swFeat.Name)
+        
+        Debug.Print "Pointers are equal: " & (swCompFeat Is swCompFeatByName)
+        
+        MoveSketchPoints swCompFeat, swAssy
+        
+    Else
+        MsgBox "Please open assembly document"
+    End If
+    
+End Sub
+
+Sub MoveSketchPoints(sketchFeat As SldWorks.Feature, editModel As SldWorks.ModelDoc2)
+    
+    Dim swSketch As SldWorks.Sketch
+    Set swSketch = sketchFeat.GetSpecificFeature2
+    
+    Debug.Print "Sketch Feature Selected: " & sketchFeat.Select2(False, -1)
+    
+    editModel.SketchManager.Insert3DSketch True
+    
+    Dim vSkPts As Variant
+    vSkPts = swSketch.GetSketchPoints2()
+    
+    Dim i As Integer
+    
+    For i = 0 To UBound(vSkPts)
+        Dim swSkPt As SldWorks.SketchPoint
+        Set swSkPt = vSkPts(i)
+        swSkPt.X = swSkPt.X + 0.01
+        swSkPt.Y = swSkPt.Y + 0.01
+        swSkPt.Z = swSkPt.Z + 0.01
+    Next
+    
+    editModel.SketchManager.Insert3DSketch True
+    
+End Sub
+~~~
+
+
 
 * Macro stops execution
 * Activate the assembly (you can just close the part document)

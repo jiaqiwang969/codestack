@@ -17,7 +17,7 @@ Module must have an unique name which can be defined by the developer.
 
 ![Module properties](module-properties.png)
 
-Functions defined in module are public. Members (variables) declared with **Dim** keyword are only visible within this module scope and not visible for another modules, while members declared with **Public** keyword are visible for this and other modules. Refer [Variables Scope](visual-basic/variables/scope) article for more information.
+Functions defined in module are public. Members (variables) declared with **Dim** keyword are only visible within this module scope and not visible for another modules, while members declared with **Public** keyword are visible for this and other modules. Refer [Variables Scope](/docs/codestack/visual-basic/variables/scope) article for more information.
 
 ![Module members](module-members.png)
 

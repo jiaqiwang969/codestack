@@ -64,4 +64,4 @@ There is however a limitation with GoDaddy e-mail forwarding as encryption is no
 
 ![Security warning](unsecure-email.png)
 
-Follow the [Setup Google Domains e-mail forwarding from custom domain for free](/hosting/email/googledomains-email-forwarding/) to setup similar free service with Google Domains which supports e-mails encryption and overcomes this limitation. You will need to [Transfer domain host from GoDaddy to Google Domains](/hosting/domain/transfer-godaddy-domain-to-googledomains/) to use this service.
+Follow the [Setup Google Domains e-mail forwarding from custom domain for free](/docs/codestack/hosting/email/googledomains-email-forwarding/) to setup similar free service with Google Domains which supports e-mails encryption and overcomes this limitation. You will need to [Transfer domain host from GoDaddy to Google Domains](/docs/codestack/hosting/domain/transfer-godaddy-domain-to-googledomains/) to use this service.

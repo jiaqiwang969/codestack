@@ -26,7 +26,51 @@ This approach loops the selected objects and blocks the current thread until the
 
 ![VBA macro stops once specified object is selected](selection-stop-execution.png){ width=550 }
 
-{% code-snippet { file-name: MacroBlocking.vba } %}
+~~~ vb
+Const FILTER As Integer = swSelectType_e.swSelEDGES
+
+Dim swApp As SldWorks.SldWorks
+
+Sub main()
+
+    Set swApp = Application.SldWorks
+    
+    Dim swModel As SldWorks.ModelDoc2
+    
+    Set swModel = swApp.ActiveDoc
+    
+    If Not swModel Is Nothing Then
+        
+        swModel.ClearSelection2 True
+        
+        Dim swSelMgr As SldWorks.SelectionMgr
+        
+        Set swSelMgr = swModel.SelectionManager
+        
+        Dim swObject As Object
+        
+        While swObject Is Nothing
+            
+            Dim i As Integer
+            
+            For i = 1 To swSelMgr.GetSelectedObjectCount2(-1)
+                If swSelMgr.GetSelectedObjectType3(i, -1) = FILTER Then
+                    Set swObject = swSelMgr.GetSelectedObject6(i, -1)
+                End If
+            Next
+            DoEvents
+        Wend
+        
+        Stop
+        
+    Else
+        MsgBox "Please open the model"
+    End If
+    
+End Sub
+~~~
+
+
 
 ## Handling the selection event
 
@@ -43,8 +87,87 @@ This approach uses the SOLIDWORKS notifications to handle the selection. This is
 
 ### Macro Module
 
-{% code-snippet { file-name: MacroEvent.vba } %}
+~~~ vb
+Const FILTER As Integer = swSelectType_e.swSelEDGES
+
+Dim swApp As SldWorks.SldWorks
+Dim swEventsListener As EventsListener
+
+Sub main()
+
+    Set swApp = Application.SldWorks
+        
+    Dim swModel As SldWorks.ModelDoc2
+    
+    Set swModel = swApp.ActiveDoc
+    
+    If Not swModel Is Nothing Then
+        
+        Set swEventsListener = New EventsListener
+        swEventsListener.WaitForSelection swModel, FILTER
+        
+    Else
+        MsgBox "Please open the model"
+    End If
+End Sub
+~~~
+
+
 
 ### EventsListener Class Module
 
-{% code-snippet { file-name: EventsListener.vba } %}
+~~~ vb
+Dim WithEvents swPart As SldWorks.PartDoc
+Dim WithEvents swAssy As SldWorks.AssemblyDoc
+Dim WithEvents swDraw As SldWorks.DrawingDoc
+
+Dim swModel As SldWorks.ModelDoc2
+Dim swSelMgr As SldWorks.SelectionMgr
+
+Dim swSelFilter As Integer
+
+Sub WaitForSelection(model As SldWorks.ModelDoc2, selFilter As Integer)
+        
+    Set swModel = model
+    swSelFilter = selFilter
+            
+    Set swSelMgr = swModel.SelectionManager
+            
+    If TypeOf model Is SldWorks.PartDoc Then
+        Set swPart = model
+    ElseIf TypeOf model Is SldWorks.AssemblyDoc Then
+        Set swAssy = model
+    ElseIf TypeOf model Is SldWorks.DrawingDoc Then
+        Set swDraw = model
+    End If
+    
+End Sub
+
+Private Function swPart_NewSelectionNotify() As Long
+    HandleSelection
+End Function
+
+Private Function swAssy_NewSelectionNotify() As Long
+    HandleSelection
+End Function
+
+Private Function swDraw_NewSelectionNotify() As Long
+    HandleSelection
+End Function
+
+Sub HandleSelection()
+    
+    Dim selCount As Integer
+    selCount = swSelMgr.GetSelectedObjectCount2(-1)
+    
+    If selCount > 0 Then
+        If swSelMgr.GetSelectedObjectType3(selCount, -1) = swSelFilter Then
+            Dim swObject As Object
+            Set swObject = swSelMgr.GetSelectedObject6(selCount, -1)
+            Stop
+        End If
+    End If
+End Sub
+~~~
+
+

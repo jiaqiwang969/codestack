@@ -28,7 +28,7 @@ Properties of the controls can be customized.
 
 ## Code Behind
 
-Form and its controls are exposing different [events](/visual-basic/events/), such as click, select, mouse move etc.
+Form and its controls are exposing different [events](/docs/codestack/visual-basic/events/), such as click, select, mouse move etc.
 
 Event handlers are defined in the code behind of the form.
 

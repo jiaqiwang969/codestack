@@ -26,11 +26,3 @@ Add-in can be downloaded from [this link v. 0.5.0 (beta 1)](https://github.com/c
 
 Source code is available at [GitHub](https://github.com/codestackdev/stock-fit-geometry)
 
-## Demonstration Video (outdated)
-
-<center>
-<video style="width: 100%;height: auto" controls>
-  <source src="/labs/solidworks/stock-fit-geometry/stock-fit-geometry-preview-demo.mp4" type="video/mp4">
-  Your browser does not support HTML5 video.
-</video>
-</center>

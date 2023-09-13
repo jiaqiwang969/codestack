@@ -54,11 +54,67 @@ In order to retrieve the upper and lower boundaries of the array **UBound** and 
 
 ![Run-time error 9: subscript out of range while reading the upper boundary of uninitialized array](subscript-out-of-range.png){ width=350 }
 
-{% code-snippet { file-name: initialize.vba } %}
+~~~ vb
+Sub InitializeArray()
+    
+    Dim doubleArr() As Double 'not initialized array
+    
+    'Array is initialized = False
+    Debug.Print "Array is initialized = " & IsArrayInitialized(doubleArr)
+    
+    ReDim doubleArr(2) 'resizing array to hold 3 doubles
+    
+    'Array is initialized = True of size 3
+    Debug.Print "Array is initialized = " & IsArrayInitialized(doubleArr) & " of size " & GetArraySize(doubleArr)
+    
+    Dim textArr(4) As String 'initialized at declaration
+    'Array is initialized = True of size 5
+    Debug.Print "Array is initialized = " & IsArrayInitialized(textArr) & " of size " & GetArraySize(textArr)
+    
+    'initializing with custom boundaries
+    Dim intArr(1 To 5) As Integer
+    'Array is initialized = True of size 5 (1 to 5)
+    Debug.Print "Array is initialized = " & IsArrayInitialized(intArr) & " of size " & GetArraySize(intArr) & " (" & LBound(intArr) & " to " & UBound(intArr) & ")"
+    
+    'Debug.Print intArr(0) 'Run-time error 9: subscript out of range
+    
+End Sub
+
+Function IsArrayInitialized(vArr As Variant) As Boolean
+
+    If IsArray(vArr) Then
+        
+        On Error GoTo End_
+        
+        If UBound(vArr) >= 0 Then
+            IsArrayInitialized = True
+            Exit Function
+        End If
+        
+    End If
+
+End_:
+
+    IsArrayInitialized = False
+    
+End Function
+
+Function GetArraySize(vArr As Variant) As Integer
+    
+    If IsArrayInitialized(vArr) Then
+        GetArraySize = UBound(vArr) - LBound(vArr) + 1
+    Else
+        GetArraySize = 0
+    End If
+    
+End Function
+~~~
+
+
 
 ## Filling array with data
 
-Array elements can be treated as individual variables and the same rules of reading and editing the data applies to array elements as any other variable. Refer [Variables](visual-basic/variables) article for more information.
+Array elements can be treated as individual variables and the same rules of reading and editing the data applies to array elements as any other variable. Refer [Variables](/docs/codestack/visual-basic/variables) article for more information.
 
 ~~~ vb
 Dim arr(2) As Double
@@ -66,7 +122,33 @@ arr(<INDEX>) = 10 'changing the value of the variable at <INDEX>
 Debug.Print arr(<INDEX>) 'reading the value of the variable at <INDEX>
 ~~~
 
-{% code-snippet { file-name: fill.vba } %}
+~~~ vb
+Sub FillArray()
+    
+    Dim doubleArr(2) As Double 'array initialized from the declaration
+    Dim i As Integer
+    
+    For i = 0 To UBound(doubleArr)
+        doubleArr(i) = i + 1
+    Next
+    
+    '1 2 3
+    For i = 0 To UBound(doubleArr)
+        Debug.Print doubleArr(i)
+    Next
+
+    Dim vArr As Variant
+    vArr = Array("A", "B", "C", "D") 'filling the variant array on initialization
+    
+    'A B C D
+    For i = 0 To UBound(vArr)
+        Debug.Print vArr(i)
+    Next
+    
+End Sub
+~~~
+
+
 
 ## Resizing array
 
@@ -85,13 +167,61 @@ Attempt of resizing the already dimensioned array will result in the compile err
 
 **ReDim** keyword allows to resize the array. In this case all existing values will be cleared.
 
-{% code-snippet { file-name: resize-clear.vba } %}
+~~~ vb
+Sub ResizeAndClearArray()
+    
+    Dim doubleArr() As Double
+    Dim i As Integer
+    
+    ReDim doubleArr(2)
+    
+    For i = 0 To UBound(doubleArr)
+        doubleArr(i) = i + 1
+    Next
+    
+    'resizing and clearing the array
+    ReDim doubleArr(3)
+    doubleArr(3) = 4
+    
+    '0 0 0 4
+    For i = 0 To UBound(doubleArr)
+        Debug.Print doubleArr(i)
+    Next
+
+End Sub
+~~~
+
+
 
 ### Preserving existing values
 
 In order to keep the existing values of the array it is required to use **ReDim Preserve** keyword.
 
-{% code-snippet { file-name: resize-preserve.vba } %}
+~~~ vb
+Sub ResizeAndPreserveArray()
+
+    Dim doubleArr() As Double 'array initialized from the declaration
+    Dim i As Integer
+
+    ReDim doubleArr(3)
+    
+    For i = 0 To UBound(doubleArr)
+        doubleArr(i) = i + 1
+    Next
+    
+    'resizing the array and preserving the values
+    ReDim Preserve doubleArr(4)
+    doubleArr(4) = 5
+    
+    '1 2 3 4 5
+    For i = 0 To UBound(doubleArr)
+        Debug.Print doubleArr(i)
+    Next
+
+End Sub
+~~~
+
+
 
 ### Resizing arrays dynamically
 
@@ -99,7 +229,26 @@ In some cases it might be unknown in advance the size of the array or when the f
 
 In this cases it is beneficial to only init array when needed. It is possible to use the following statement to identify if the array is not initialized `(Not array) = -1` and init with a first item or dynamically resize preserving the existing values.
 
-{% code-snippet { file-name: resize-dynamically.vba } %}
+~~~ vb
+Dim evenNumbersArr() As Integer
+
+Dim i As Integer
+
+For i = 0 To 100
+    If i Mod 2 = 0 Then
+                
+        If (Not evenNumbersArr) = -1 Then
+            ReDim evenNumbersArr(0)
+        Else
+            ReDim Preserve evenNumbersArr(UBound(evenNumbersArr) + 1)
+        End If
+        
+        evenNumbersArr(UBound(evenNumbersArr)) = i
+    End If
+Next
+~~~
+
+
 
 ## Two dimensional array
 
@@ -111,6 +260,33 @@ Dim table(<ROWS COUNT>, <COLUMNS COUNT>) As String
 
 > 2-dimensional array can be resized, but if it is required to preserve the values only second (column) dimension can be resized.
 
-{% code-snippet { file-name: two-dimensional.vba } %}
+~~~ vb
+Sub TwoDimensionalArrays()
+    
+    '3 rows and 4 columns
+    Dim matrixArr() As String
+    ReDim matrixArr(2, 3)
+        
+    Dim i As Integer
+    Dim j As Integer
+    
+    For i = 0 To UBound(matrixArr, 1)
+        For j = 0 To UBound(matrixArr, 2)
+        matrixArr(i, j) = (i + 1) & "." & (j + 1)
+        Next
+    Next
+    
+    'first dimension cannot be resized
+    'ReDim Preserve matrixArr(5, 5) 'Run-time error 9: subscript out of range
+    
+    'second dimension can be resized preserving the data
+    ReDim Preserve matrixArr(2, 4)
+    
+    ReDim matrixArr(5, 5) 'dimensions of the array can be changed when cleared
+    
+End Sub
+~~~
+
+
 
 ![Values of two-dimensional array (matrixArr) in the Watch window from the code above](two-dimensional-array.png)

@@ -47,7 +47,7 @@ Sub main()
 End Sub
 ~~~
 
-Alternatively public member can be declared with the *Global* keyword. It will act exactly the same as *Public* however can only be declared within the [module](/visual-basic/modules/) and cannot be declared in the [user form](/visual-basic/user-forms/) or [class module](/visual-basic/classes/).
+Alternatively public member can be declared with the *Global* keyword. It will act exactly the same as *Public* however can only be declared within the [module](/docs/codestack/visual-basic/modules/) and cannot be declared in the [user form](/docs/codestack/visual-basic/user-forms/) or [class module](/docs/codestack/visual-basic/classes/).
 
 ## Local
 
@@ -101,13 +101,68 @@ This example demonstrates the behaviour of variables declared in the different s
 *Module1*
 ![Module1 module in the Visual Basic Project](custom-module-named-module1.png)
 
-{% code-snippet { file-name: different-scopes-example-module1.vba } %}
+~~~ vb
+Public Module1PublicText As String 'public variable is visible outside of the module
+Dim Module1PrivateText As String 'only visible by functions and properties of this module
+
+Sub Init()
+    
+    Module1PublicText = "Module1 Public Text"
+    Module1PrivateText = "Module1 Private Text"
+    
+End Sub
+~~~
+
+
 
 *Main Module*
 
-{% code-snippet { file-name: different-scopes-example.vba } %}
+~~~ vb
+Dim memberInt As Integer
 
-Output to [Immediate Window](visual-basic/vba/vba-editor/windows#immediate-window)
+Sub main()
+    
+    memberInt = 10
+    
+    Dim localString As String
+    localString = "Hello World"
+
+    Debug.Print memberInt 'Prints 10
+    Debug.Print localString 'Prints Hello World
+    
+    proc
+    proc2
+    module
+    
+End Sub
+
+Sub proc()
+    
+    Dim localString As String
+    localString = "New Hello World"
+    
+    memberInt = 20
+    
+    Debug.Print localString 'Prints New Hello World
+    Debug.Print memberInt 'Prints 20
+    
+End Sub
+
+Sub proc2()
+    Debug.Print localString 'prints empty string as localString local variable from main and proc functions are not visible in this scope
+    Debug.Print memberInt 'prints 20 as module level variable was modified in proc function
+End Sub
+
+Sub module()
+    Module1.Init
+    'Debug.Print Module1.Module1PrivateText 'compile error as variable is not visible outside of module 1
+    Debug.Print Module1.Module1PublicText 'prints Module1 Public Text
+End Sub
+~~~
+
+
+
+Output to [Immediate Window](/docs/codestack/visual-basic/vba/vba-editor/windows#immediate-window)
 
 ![Output of variable values](immediate-window-output.png){ width=350 }
 

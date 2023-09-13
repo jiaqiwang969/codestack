@@ -43,8 +43,8 @@ If password matches, the sheet format can be edited, otherwise the command is ca
 ## Creating the macro
 
 * Create new macro and paste [the code](#macro-module) of Macro Module
-* Add new [class module](/visual-basic/classes/) and name it *SheetFormatEditorHandler*. Paste the [code below](#sheetformateditorhandler-class) into class module.
-* Add new [user form](/visual-basic/user-forms/) and name it *PasswordBox*. Paste the [code below](#passwordbox-user-form) into the user form code
+* Add new [class module](/docs/codestack/visual-basic/classes/) and name it *SheetFormatEditorHandler*. Paste the [code below](#sheetformateditorhandler-class) into class module.
+* Add new [user form](/docs/codestack/visual-basic/user-forms/) and name it *PasswordBox*. Paste the [code below](#passwordbox-user-form) into the user form code
 * Add the controls to the form as shown below and specify the name of each control as marked on the image
 
 ![Controls in password box user form](password-box-controls.png)
@@ -57,7 +57,7 @@ The files tree should look similar to below image.
 
 ![Macro files tree](macro-files-tree.png)
 
-Follow the [Run Macro On SOLIDWORKS Start](/solidworks-api/getting-started/macros/run-macro-on-solidworks-start/) for the instruction of setting up the automatic run of the macro on SOLIDWORKS startup.
+Follow the [Run Macro On SOLIDWORKS Start](/docs/codestack/solidworks-api/getting-started/macros/run-macro-on-solidworks-start/) for the instruction of setting up the automatic run of the macro on SOLIDWORKS startup.
 
 ## Blocking other commands
 
@@ -73,7 +73,7 @@ To the
 If Command = CmdId1 Or Command = CmdId2 ... Or Command = CmdId3 Then
 ~~~
 
-For example the following line would block editing sketch, opening the SOLIDWORKS options dialog and printing the document. Refer the [Capture Commands](/solidworks-api/application/frame/capture-commands/) macro for an explanation of how to extract the IDs for the specific command in SOLIDWORKS.
+For example the following line would block editing sketch, opening the SOLIDWORKS options dialog and printing the document. Refer the [Capture Commands](/docs/codestack/solidworks-api/application/frame/capture-commands/) macro for an explanation of how to extract the IDs for the specific command in SOLIDWORKS.
 
 ~~~ vb
 If Command = 859 Or Command = 342 Or Command = 589 Then
@@ -81,12 +81,86 @@ If Command = 859 Or Command = 342 Or Command = 589 Then
 
 ### Macro Module
 
-{% code-snippet { file-name: Macro.vba } %}
+~~~ vb
+Public Const LOCK_WITH_PASSWORD As Boolean = True
+Public Const PASSWORD As String = "admin"
+
+Dim swSheetFormatEditorHandler As SheetFormatEditorHandler
+
+Sub main()
+
+    Set swSheetFormatEditorHandler = New SheetFormatEditorHandler
+    
+End Sub
+
+~~~
+
+
 
 ### SheetFormatEditorHandler Class
 
-{% code-snippet { file-name: SheetFormatEditorHandler.vba } %}
+~~~ vb
+Dim WithEvents swApp As SldWorks.SldWorks
+
+Private Sub Class_Initialize()
+    Set swApp = Application.SldWorks
+End Sub
+
+Private Function swApp_CommandOpenPreNotify(ByVal Command As Long, ByVal UserCommand As Long) As Long
+    
+    Const swCommands_Edit_Template As Long = 1501
+    
+    If Command = swCommands_Edit_Template Then
+        Dim cancel As Boolean
+        cancel = True
+        
+        If LOCK_WITH_PASSWORD Then
+            
+            Dim pwd As String
+            PasswordBox.Message = "Sheet format editing is locked. Please enter password to unlock"
+            PasswordBox.ShowDialog
+            pwd = PasswordBox.Password
+            
+            If pwd <> "" Then
+                If pwd = Password Then
+                    cancel = False
+                Else
+                    swApp.SendMsgToUser2 "Password is incorrect", swMessageBoxIcon_e.swMbStop, swMessageBoxBtn_e.swMbOk
+                End If
+            End If
+        Else
+            swApp.SendMsgToUser2 "Sheet format editing is locked", swMessageBoxIcon_e.swMbInformation, swMessageBoxBtn_e.swMbOk
+        End If
+        
+        swApp_CommandOpenPreNotify = IIf(cancel, 1, 0)
+    End If
+    
+End Function
+~~~
+
+
 
 ### PasswordBox User Form
 
-{% code-snippet { file-name: PasswordBox.vba } %}
+~~~ vb
+Public Password As String
+
+Public Property Let Message(msg As String)
+     lblMessage.Caption = msg
+End Property
+
+Public Sub ShowDialog()
+    Password = ""
+    txtPassword.Text = ""
+    Show vbModal
+End Sub
+
+Private Sub btnOk_Click()
+    
+    Password = txtPassword.Text
+    Me.Hide
+    
+End Sub
+~~~
+
+

@@ -5,7 +5,7 @@ caption: Classes
 image: insert-class-module.png
 order: 13
 ---
-Class is a fundamental concept of Object Oriented Programming (OOP). Class can be considered as repository for storing data in class level [variables](/visual-basic/variables/), and providing [functions](/visual-basic/functions/), [properties](/visual-basic/properties/) and exposing [events](/visual-basic/events/).
+Class is a fundamental concept of Object Oriented Programming (OOP). Class can be considered as repository for storing data in class level [variables](/docs/codestack/visual-basic/variables/), and providing [functions](/docs/codestack/visual-basic/functions/), [properties](/docs/codestack/visual-basic/properties/) and exposing [events](/docs/codestack/visual-basic/events/).
 
 Classes are created in the class modules
 
@@ -39,7 +39,7 @@ cl1.Var2 = 1
 cl2.Var2 = 2
 ~~~
 
-Classes are similar to [modules](/visual-basic/modules/), but there are several differences:
+Classes are similar to [modules](/docs/codestack/visual-basic/modules/), but there are several differences:
 
 * It is required to create an instance of a class using **new** keyword
 * All the data associated with this class wil be stored within its instance, which means that different instances of the same class may have different data.

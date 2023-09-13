@@ -5,7 +5,7 @@ description: Article describing the benefits of collections (dynamic lists) to s
 image: collection-key-already-associated.png
 order: 2
 ---
-Visual Basic collection is a data sets similar to [Array](visual-basic/data-sets/array) designed to hold dynamically changing data. Unlike arrays collection doesn't need to be resized to add or remove values.
+Visual Basic collection is a data sets similar to [Array](/docs/codestack/visual-basic/data-sets/array) designed to hold dynamically changing data. Unlike arrays collection doesn't need to be resized to add or remove values.
 
 Collection is a reference type and it is required to use **new** keyword to initiate the collection
 
@@ -54,7 +54,28 @@ Debug.Print coll.Item(<Index Of Element>)
 Debug.Print coll(<Index Of Element>)
 ~~~
 
-{% code-snippet { file-name: add-insert-items.vba } %}
+~~~ vb
+Sub AddInsertItems()
+
+    Dim coll As Collection
+    Set coll = New Collection
+    
+    coll.Add "A"
+    coll.Add "D"
+    coll.Add "B", , , 1 'insert after first element
+    coll.Add "C", , 3 'insert before 3rd element
+    
+    Dim i As Integer
+    
+    'A B C D
+    For i = 1 To coll.Count() 'collection is 1-base indexed
+        Debug.Print coll.Item(i)
+    Next
+    
+End Sub
+~~~
+
+
 
 ### Indexing items by keys
 
@@ -76,7 +97,35 @@ Elements in the collection can be accessed by key (similar to the way they acces
 Debug.Print coll.Item("<Key Name>")
 ~~~
 
-{% code-snippet { file-name: add-items-with-keys.vba } %}
+~~~ vb
+Sub AddItemsWithKeys()
+
+    Dim mathConstColl As Collection
+    Set mathConstColl = New Collection
+    
+    mathConstColl.Add 3.14, "PI" 'number PI
+    mathConstColl.Add 9.8, "G" 'gravitational constant
+    mathConstColl.Add 2.71, "e" 'Euler's number
+    
+    Dim i As Integer
+    
+    'traverse all
+    For i = 1 To mathConstColl.Count()
+        Debug.Print mathConstColl(i) 'item can be accessed directly without the Item property
+    Next
+    
+    'Access values by key
+    Debug.Print mathConstColl("PI")
+    Debug.Print mathConstColl("G")
+    Debug.Print mathConstColl("e")
+    
+    mathConstColl.Remove 1
+    mathConstColl.Remove "e"
+
+End Sub
+~~~
+
+
 
 ### Removing items
 
@@ -87,4 +136,29 @@ coll.Remove(<Index of Element>)
 coll.Remove("<Key of Element>")
 ~~~
 
-{% code-snippet { file-name: remove-items.vba } %}
+~~~ vb
+Sub RemoveItems()
+    
+    Dim coll As Collection
+    Set coll = New Collection
+    
+    'items are stored as variant, so data types can be mixed
+    coll.Add "A"
+    coll.Add 1, "IntegerItem"
+    coll.Add 10.5
+    coll.Add True, "BoolItem"
+    
+    coll.Remove 1 'removing first item by index
+    coll.Remove "BoolItem" 'removing item by key
+    
+    Dim i As Integer
+    
+    '1 10.5
+    For i = 1 To coll.Count()
+        Debug.Print coll(i)
+    Next
+    
+End Sub
+~~~
+
+

@@ -4,7 +4,7 @@ caption: Via SWBasic Macro
 description: Workaround of passing the parameters to the SOLIDWORKS macro via replacing the text in the SWBasic macro
 labels: [argument, swb]
 ---
-[SWBasic (*.swb) macros](/solidworks-api/getting-started/macros/types#swbasic-macros.swb) is a legacy type of macros still supported in SOLIDWORKS applications.
+[SWBasic (*.swb) macros](/docs/codestack/solidworks-api/getting-started/macros/types#swbasic-macros.swb) is a legacy type of macros still supported in SOLIDWORKS applications.
 
 One of the benefits of this type of macro is that it is saved in the plain text. This enables 3rd party application to create macros on the fly. In particular this technique can be employed to emulate the passing of parameters to the SOLIDWORKS macro.
 
@@ -29,4 +29,4 @@ static void Main(string[] args)
     File.WriteAllText(tempMacroPath, macro);
 ~~~
 
-The resulting file can be run as a normal [SOLIDWORKS macro](/solidworks-api/application/frame/run-macros-group/)
+The resulting file can be run as a normal [SOLIDWORKS macro](/docs/codestack/solidworks-api/application/frame/run-macros-group/)

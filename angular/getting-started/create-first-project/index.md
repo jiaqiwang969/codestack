@@ -66,7 +66,7 @@ In selected terminal navigate to source code folder on you machine and create ne
 ~~~
 
 <video controls>
-  <source src=".\init-angular-app.mp4" width="350" type="video/mp4">Create new Angular Project
+  <source src=".\init-angular-app.mp4" width="350" type="video/mp4"/>Create new Angular Project
 </video>
 
 Angular CLI will create the application environment for you and install npm packages.

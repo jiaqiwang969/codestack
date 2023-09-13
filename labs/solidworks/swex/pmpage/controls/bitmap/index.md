@@ -18,4 +18,4 @@ Default size of the bitmap is 18x18 pixels, however this could be overridden usi
 
 {% code-snippet { file-name: Bitmap.Size.* } %}
 
-> Due to SOLIDWORKS API limitation bitmap cannot be changed as [dynamic value](/labs/solidworks/swex/pmpage/controls/dynamic-values/) after property manager page is displayed. Assign the image in the data model class constructor or as a default value of the property.
+> Due to SOLIDWORKS API limitation bitmap cannot be changed as [dynamic value](/docs/codestack/labs/solidworks/swex/pmpage/controls/dynamic-values/) after property manager page is displayed. Assign the image in the data model class constructor or as a default value of the property.

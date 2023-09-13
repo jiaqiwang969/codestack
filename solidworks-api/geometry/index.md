@@ -15,7 +15,7 @@ This interface allows to manipulate the geometry on a kernel level:
 * Create curves
 * Trim curves and surfaces
 
-Geometry API is most commonly used to generate and modify bodies in [Macro Features](solidworks-api/document/macro-feature/).
+Geometry API is most commonly used to generate and modify bodies in [Macro Features](/docs/codestack/solidworks-api/document/macro-feature/).
 
 This section contains examples of working with geometry (adding, editing) using SOLIDWORKS API.
 

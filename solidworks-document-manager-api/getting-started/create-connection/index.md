@@ -24,7 +24,7 @@ Follow the steps below:
 
 ![Options for Document Manager Key](doc-mgr-key-options.png){ width=320 height=95 }
 
-* Fill the request form and select the functionality required for your software (refer [Supported Functionality](solidworks-document-manager-api/#supported-functionality) section to select the right functions)
+* Fill the request form and select the functionality required for your software (refer [Supported Functionality](/docs/codestack/solidworks-document-manager-api/#supported-functionality) section to select the right functions)
 
 ![Document Manager supported functionality](dm-functionality.png){ width=320 height=246 }
 
@@ -69,29 +69,152 @@ Run Windows Command line with administrative right with the following command
 
 ### VBA
 
-Add the reference to swdocumentmgr.dll. The dll can be usually found at C:\Program Files\Common Files\SOLIDWORKS Shared. Document manager license key might be too long so VBA editor will not be able to compile the macro. Refer the [Too Long VBA Macro Line](/solidworks-api/troubleshooting/macros/too-long-vba-macro-line/) troubleshooting article for the solution of this issue.
+Add the reference to swdocumentmgr.dll. The dll can be usually found at C:\Program Files\Common Files\SOLIDWORKS Shared. Document manager license key might be too long so VBA editor will not be able to compile the macro. Refer the [Too Long VBA Macro Line](/docs/codestack/solidworks-api/troubleshooting/macros/too-long-vba-macro-line/) troubleshooting article for the solution of this issue.
 
-{% code-snippet { file-name: init-doc-mgr.vba } %}
+~~~ vb
+Const SW_DM_KEY As String = "[CompanyName]:swdocmgr_general-00000-{31 times},swdocmgr_previews-00000-{31 times},swdocmgr_dimxpert-00000-{31 times},swdocmgr_geometry-00000-{31 times},swdocmgr_xml-00000-{31 times},swdocmgr_tessellation-00000-{31 times}"
+
+Dim swDmClassFactory As SwDocumentMgr.swDmClassFactory
+Dim swDmApp As SwDocumentMgr.SwDMApplication
+
+Sub main()
+
+    Set swDmClassFactory = CreateObject("SwDocumentMgr.SwDMClassFactory")
+    
+    If Not swDmClassFactory Is Nothing Then
+        Set swDmApp = swDmClassFactory.GetApplication(SW_DM_KEY)
+        Debug.Print swDmApp.GetLatestSupportedFileVersion()
+    Else
+        MsgBox "Document Manager SDK is not installed"
+    End If
+    
+End Sub
+~~~
+
+
 
 ### C#
 
 Add the reference to SolidWorks.Interop.swdocumentmgr.dll. The dll can be usually found at C:\Program Files\Common Files\SOLIDWORKS Shared.
 Uncheck the Embed Interop Types option in the reference properties.
 
-{% code-snippet { file-name: init-doc-mgr.cs } %}
+~~~ cs
+using SolidWorks.Interop.swdocumentmgr;
+using System;
+
+namespace CodeStack
+{
+    class Program
+    {
+        const string SW_DM_KEY = "[CompanyName]:swdocmgr_general-00000-{31 times},swdocmgr_previews-00000-{31 times},swdocmgr_dimxpert-00000-{31 times},swdocmgr_geometry-00000-{31 times},swdocmgr_xml-00000-{31 times},swdocmgr_tessellation-00000-{31 times}";
+
+        static void Main(string[] args)
+        {
+            SwDMClassFactory classFactory = Activator.CreateInstance(
+                Type.GetTypeFromProgID("SwDocumentMgr.SwDMClassFactory")) as SwDMClassFactory;
+
+            if (classFactory != null)
+            {
+                SwDMApplication dmApp = classFactory.GetApplication(SW_DM_KEY);
+                Console.WriteLine(dmApp.GetLatestSupportedFileVersion());
+            }
+            else
+            {
+                throw new NullReferenceException("Document Manager SDK is not installed");
+            }
+        }
+    }
+}
+~~~
+
+
 
 ### VB.NET
 
 Add the reference to SolidWorks.Interop.swdocumentmgr.dll. The dll can be usually found at C:\Program Files\Common Files\SOLIDWORKS Shared.
 Uncheck the Embed Interop Types option in the reference properties.
 
-{% code-snippet { file-name: init-doc-mgr.vb } %}
+~~~ vb
+Imports SolidWorks.Interop.swdocumentmgr
+Imports System
+
+Module CodeStack
+
+    Const SW_DM_KEY As String = "[CompanyName]:swdocmgr_general-00000-{31 times},swdocmgr_previews-00000-{31 times},swdocmgr_dimxpert-00000-{31 times},swdocmgr_geometry-00000-{31 times},swdocmgr_xml-00000-{31 times},swdocmgr_tessellation-00000-{31 times}"
+
+    Sub Main(ByVal args As String())
+
+        Dim classFactory As SwDMClassFactory =
+            TryCast(Activator.CreateInstance(Type.GetTypeFromProgID("SwDocumentMgr.SwDMClassFactory")), SwDMClassFactory)
+
+        If classFactory IsNot Nothing Then
+            Dim dmApp As SwDMApplication = classFactory.GetApplication(SW_DM_KEY)
+            Console.WriteLine(dmApp.GetLatestSupportedFileVersion())
+        Else
+            Throw New NullReferenceException("Document Manager SDK is not installed")
+        End If
+
+    End Sub
+
+End Module
+~~~
+
+
 
 ### C++
 
 Add the path to swdocumentmgr.dll (usually C:\Program Files\Common Files\SOLIDWORKS Shared) into the Project Properties->C/C++->General->Additional Include Directories
 
-{% code-snippet { file-name: init-doc-mgr.cpp } %}
+~~~ cpp
+#include "stdafx.h"
+#import "SwDocumentMgr.dll" raw_interfaces_only
+#include <iostream>
+
+#define SW_DM_KEY L"[CompanyName]:swdocmgr_general-00000-{31 times},swdocmgr_previews-00000-{31 times},swdocmgr_dimxpert-00000-{31 times},swdocmgr_geometry-00000-{31 times},swdocmgr_xml-00000-{31 times},swdocmgr_tessellation-00000-{31 times}"
+
+int main()
+{
+    CoInitialize(NULL);
+
+    CComPtr pClassFactory;
+
+    if (SUCCEEDED(pClassFactory.CoCreateInstance(
+        __uuidof(SwDocumentMgr::SwDMClassFactory), NULL, CLSCTX_INPROC_SERVER)))
+    {
+        CComPtr pDmApp;
+
+        if (SUCCEEDED(pClassFactory->GetApplication(SW_DM_KEY, &pDmApp)))
+        {
+            long latestVers;
+
+            HRESULT r = pDmApp->GetLatestSupportedFileVersion(&latestVers);
+
+            if (SUCCEEDED(r))
+            {
+                std::cout << latestVers;
+            }
+            else
+            {
+                std::cout << "Failed to get version";
+            }
+        }
+
+        pDmApp = NULL;
+        pClassFactory = NULL;
+        ::CoUninitialize();
+    }
+    else
+    {
+        std::cout << "Document Manager SDK is not installed";
+    }
+    
+    std::cin.get();
+
+    return 0;
+}
+~~~
+
+
 
 ## References
 

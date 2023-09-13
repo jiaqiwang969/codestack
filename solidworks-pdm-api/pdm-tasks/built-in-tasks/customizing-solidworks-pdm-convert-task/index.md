@@ -38,7 +38,12 @@ Script is utilizing SOLIDWORKS APIs and is written in Visual Basic (the same lan
 
 As an example, in order to set the DPI settings for the PDF output is it required to add the following lines into the *SetConversionOptions* function as shown below:
 
-{% code-snippet { file-name: change-pdf-dpi.vba } %}
+~~~ vb
+swApp.SetUserPreferenceIntegerValue swUserPreferenceIntegerValue_e.swPDFExportShadedDraftDPI, 600
+swApp.SetUserPreferenceIntegerValue swUserPreferenceIntegerValue_e.swPDFExportOleDPI, 600
+~~~
+
+
 
 ![Code block to set DPI for the output file](set-dpi-output.png){ width=640 height=210 }
 
